@@ -1,13 +1,28 @@
 
 #pragma once
 
+#define MAX_MESSAGE_LENGTH			144
+#define MAX_LINE_LENGTH				MAX_MESSAGE_LENGTH / 2
 #define MAX_MESSAGES				100
 
+enum eChatMessageType {
+	CHAT_TYPE_NONE=0,
+	CHAT_TYPE_CHAT=2,
+	CHAT_TYPE_INFO=4,
+	CHAT_TYPE_DEBUG=8,
+};
 
 #pragma pack(1)
 typedef struct _CHAT_WINDOW_ENTRY
 {
-	char _gap0[252];
+	//char _gap0[252];
+	time_t field_0;
+
+	char _gap4[236];
+
+	eChatMessageType eType;
+	DWORD dwTextColor;
+	DWORD dwNickColor;
 } CHAT_WINDOW_ENTRY;
 
 class CChatWindow // size: 25578
@@ -27,6 +42,7 @@ private:
 	DWORD				m_dwChatInfoColor;
 	DWORD				m_dwChatDebugColor;
 	char _gap12E[4];
+	//char field_132[25200];
 	CHAT_WINDOW_ENTRY	m_ChatWindowEntries[MAX_MESSAGES];
 	CFontRender			*m_pFontRender;
 	ID3DXSprite			*field_63A6;
@@ -44,14 +60,21 @@ private:
 	int field_63E2;
 	char _gap63E6[4];
 
+	void FilterInvalidChars(PCHAR szString);
+	void AddToChatWindowBuffer(eChatMessageType eType,PCHAR szString,
+		PCHAR szNick,DWORD dwTextColor,DWORD dwChatColor);
 
 	void CreateFonts();
 
 	void FUNC_10067200();
 
 public:
+	CChatWindow();
 
+	void AddChatMessage(CHAR *szNick, DWORD dwNickColor, CHAR *szMessage);
+	void AddInfoMessage(CHAR *szFormat, ...);
 	void AddDebugMessage(CHAR *szFormat, ...);
+	void AddClientMessage(DWORD dwColor, PCHAR szStr);
 
 	void ResetDialogControls(CDXUTDialog *pGameUI);
 

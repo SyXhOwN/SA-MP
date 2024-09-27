@@ -19,6 +19,10 @@
 #include "BitStream.h" // BITS_TO_BYTES
 #include "GetTime.h"
 
+RakNetTime connectionStartTimeSaved=0;
+uint64_t totalBitsSentSaved=0;
+uint64_t bitsReceivedSaved=0;
+
 // Verbosity level currently supports 0 (low), 1 (medium), 2 (high)
 // Buffer must be hold enough to hold the output string.  See the source to get an idea of how many bytes will be output
 void StatisticsToString( RakNetStatisticsStruct *s, char *buffer, int verbosityLevel )
@@ -29,29 +33,25 @@ void StatisticsToString( RakNetStatisticsStruct *s, char *buffer, int verbosityL
 		return ;
 	}
 
-	if ( verbosityLevel == 0 )
-	{
-		// Verbosity level 0
-		sprintf( buffer,
-			"Total bytes sent: %u\n"
-			"Total bytes received: %u\n"
-			"Packetloss: %.1f%%\n",
-			BITS_TO_BYTES( s->totalBitsSent ),
-			BITS_TO_BYTES( s->bitsReceived + s->bitsWithBadCRCReceived ),
-			100.0f * ( float ) s->messagesTotalBitsResent / ( float ) s->totalBitsSent );
-	}
-
-	else if ( verbosityLevel == 1 )
+	if ( verbosityLevel == 1 )
 	{
 		RakNetTime time = RakNet::GetTime();
 		double elapsedTime;
 		double bpsSent;
 		double bpsReceived;
-		elapsedTime = (time-s->connectionStartTime) / 1000.0f;
-		bpsSent = (double) s->totalBitsSent / elapsedTime;
-		bpsReceived= (double) s->bitsReceived / elapsedTime;
-		// Verbosity level 1
 
+		if ( connectionStartTimeSaved == 0 )
+			connectionStartTimeSaved = s->connectionStartTime;
+
+		elapsedTime = (time-connectionStartTimeSaved) / 1000.0f;
+		bpsSent = (double) ((unsigned)s->totalBitsSent-totalBitsSentSaved) / elapsedTime;
+		bpsReceived = (double) ((unsigned)s->bitsReceived-bitsReceivedSaved) / elapsedTime;
+
+		totalBitsSentSaved = s->totalBitsSent;
+		bitsReceivedSaved = s->bitsReceived;
+		connectionStartTimeSaved = RakNet::GetTime();
+
+		// Verbosity level 1
 		sprintf( buffer,
 			"Messages in Send buffer: %u\n"
 			"Messages sent: %u\n"
@@ -67,26 +67,26 @@ void StatisticsToString( RakNetStatisticsStruct *s, char *buffer, int verbosityL
 			"Acks received: %u\n"
 			"Duplicate acks received: %u\n"
 			"Inst. KBits per second: %.1f\n"
-			"KBits per second sent:\t\t\t%.1f\n"
-			"KBits per second received:\t\t%.1f\n",
+			"KBits per second sent: %.1f\n"
+			"KBits per second received: %.1f\n",
 			s->messageSendBuffer[ SYSTEM_PRIORITY ] + s->messageSendBuffer[ HIGH_PRIORITY ] + s->messageSendBuffer[ MEDIUM_PRIORITY ] + s->messageSendBuffer[ LOW_PRIORITY ],
 			s->messagesSent[ SYSTEM_PRIORITY ] + s->messagesSent[ HIGH_PRIORITY ] + s->messagesSent[ MEDIUM_PRIORITY ] + s->messagesSent[ LOW_PRIORITY ],
-			BITS_TO_BYTES( s->totalBitsSent ),
+			( unsigned ) BITS_TO_BYTES( s->totalBitsSent ),
 			s->acknowlegementsSent,
 			s->acknowlegementsPending,
 			s->messagesOnResendQueue,
 			s->messageResends,
-			BITS_TO_BYTES( s->messagesTotalBitsResent ),
+			( unsigned ) BITS_TO_BYTES( s->messagesTotalBitsResent ),
 			100.0f * ( float ) s->messagesTotalBitsResent / ( float ) s->totalBitsSent,
 			s->duplicateMessagesReceived + s->invalidMessagesReceived + s->messagesReceived,
-			BITS_TO_BYTES( s->bitsReceived + s->bitsWithBadCRCReceived ),
+			( unsigned ) BITS_TO_BYTES( s->bitsReceived + s->bitsWithBadCRCReceived ),
 			s->acknowlegementsReceived,
 			s->duplicateAcknowlegementsReceived,
 			s->bitsPerSecond  / 1000.0,
 			bpsSent / 1000.0,
 			bpsReceived / 1000.0);
 	}
-	else
+	else if ( verbosityLevel == 2 )
 	{
 		RakNetTime time = RakNet::GetTime();
 		double elapsedTime;
@@ -169,7 +169,36 @@ void StatisticsToString( RakNetStatisticsStruct *s, char *buffer, int verbosityL
 			s->bitsPerSecond/1000.0,
 			elapsedTime,
 			bpsSent / 1000.0,
-			bpsReceived / 1000.0
-			);
+			bpsReceived / 1000.0);
+	}
+	else if ( verbosityLevel == 4 )
+	{
+		sprintf( buffer,
+			"Messages in Send buffer: %u\n"
+			"Messages sent: %u\n"
+			"Bytes sent: %u\n"
+			"Acks sent: %u\n"
+			"Acks in send buffer: %u\n"
+			"Messages waiting for ack: %u\n"
+			"Messages resent: %u\n"
+			"Bytes resent: %u\n"
+			"Packetloss: %.1f%%\n"
+			"Messages received: %u\n"
+			"Bytes received: %u\n"
+			"Acks received: %u\n"
+			"Duplicate acks received: %u\n",
+			s->messageSendBuffer[ SYSTEM_PRIORITY ] + s->messageSendBuffer[ HIGH_PRIORITY ] + s->messageSendBuffer[ MEDIUM_PRIORITY ] + s->messageSendBuffer[ LOW_PRIORITY ],
+			s->messagesSent[ SYSTEM_PRIORITY ] + s->messagesSent[ HIGH_PRIORITY ] + s->messagesSent[ MEDIUM_PRIORITY ] + s->messagesSent[ LOW_PRIORITY ],
+			( unsigned ) BITS_TO_BYTES( s->totalBitsSent ),
+			s->acknowlegementsSent,
+			s->acknowlegementsPending,
+			s->messagesOnResendQueue,
+			s->messageResends,
+			( unsigned ) BITS_TO_BYTES( s->messagesTotalBitsResent ),
+			100.0f * ( float ) s->messagesTotalBitsResent / ( float ) s->totalBitsSent,
+			s->duplicateMessagesReceived + s->invalidMessagesReceived + s->messagesReceived,
+			( unsigned ) BITS_TO_BYTES( s->bitsReceived + s->bitsWithBadCRCReceived ),
+			s->acknowlegementsReceived,
+			s->duplicateAcknowlegementsReceived);
 	}
 }

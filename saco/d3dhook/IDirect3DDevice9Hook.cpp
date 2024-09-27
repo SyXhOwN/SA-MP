@@ -1,6 +1,6 @@
 
 /*
-	Changes found:
+	Changes in:
 		IDirect3DDevice9Hook::Present
 		IDirect3DDevice9Hook::Reset
 		IDirect3DDevice9Hook::CreateDepthStencilSurface
@@ -14,6 +14,8 @@
 
 extern IDirect3DDevice9 *pD3DDevice;
 D3DXMATRIX matView, matProj, matWorld;
+extern void d3d9DestroyDeviceObjects();
+extern void d3d9RestoreDeviceObjects();
 
 //-------------------------------------------
 
@@ -106,9 +108,25 @@ UINT __stdcall IDirect3DDevice9Hook::GetNumberOfSwapChains()
 
 HRESULT __stdcall IDirect3DDevice9Hook::Reset(D3DPRESENT_PARAMETERS* pPresentationParameters)
 {
-	// TODO: IDirect3DDevice9Hook::Reset
+	d3d9DestroyDeviceObjects();
 
-	return pD3DDevice->Reset(pPresentationParameters);
+	/*
+	// Done through ALT+ENTER now
+	if (tSettings.bWindowedMode) {
+		pPresentationParameters->Windowed = 1;
+		pPresentationParameters->Flags = 0;
+		SetWindowPos(pPresentationParameters->hDeviceWindow, HWND_NOTOPMOST, 0, 0, pPresentationParameters->BackBufferWidth, pPresentationParameters->BackBufferHeight, SWP_SHOWWINDOW);
+	}
+	*/
+
+	HRESULT hr = pD3DDevice->Reset(pPresentationParameters);
+
+	if (SUCCEEDED(hr))
+	{
+		d3d9RestoreDeviceObjects();
+	}
+
+	return hr;
 }
 
 HRESULT __stdcall IDirect3DDevice9Hook::GetBackBuffer(UINT iSwapChain, UINT iBackBuffer, D3DBACKBUFFER_TYPE Type, IDirect3DSurface9** ppBackBuffer)
@@ -240,6 +258,7 @@ HRESULT __stdcall IDirect3DDevice9Hook::EndScene()
 
 HRESULT __stdcall IDirect3DDevice9Hook::Clear(DWORD Count, CONST D3DRECT* pRects, DWORD Flags, D3DCOLOR Color, float Z, DWORD Stencil)
 {
+	// +172
 	return pD3DDevice->Clear(Count, pRects, Flags, Color, Z, Stencil);
 }
 

@@ -17,4 +17,6 @@ public:
 
 	void DeleteDeviceObjects();
 	void RestoreDeviceObjects();
+
+	IDirect3DTexture9* FUNC_1006D880(char *szString);
 };

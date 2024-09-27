@@ -1,42 +1,117 @@
 
-#include "audiostream.h"
+#include "main.h"
 
-void CAudioStream::Reset()
+extern CGame *pGame;
+
+VECTOR g_vecStreamingPos;
+
+//----------------------------------------------------
+
+BOOL CAudioStream::Initialize()
 {
-	// TODO: CAudioStream::sub_10066480 10066480
+	// TODO: CAudioStream::Initialize()
+	return FALSE;
 }
 
-void CAudioStream::Stop()
+//----------------------------------------------------
+
+BOOL CAudioStream::Stop(bool bWaitForThread)
 {
-	// TODO: CAudioStream::sub_10066560 10066560
+	// TODO: CAudioStream::Stop()
+	return FALSE;
 }
 
-void CAudioStream::ConstructInfo()
+//----------------------------------------------------
+
+void CAudioStream::DoMeta()
 {
-	// TODO: CAudioStream::sub_100665C0 100665C0
+	// TODO: CAudioStream::DoMeta
 }
 
-void CAudioStream::SyncProc()
+//----------------------------------------------------
+
+void CALLBACK CAudioStream::MetaSync(HSYNC handle, DWORD channel, DWORD data, void *user)
 {
-	// TODO: CAudioStream::sub_100666F0 100666F0
+	DoMeta();
 }
 
-void CAudioStream::Process()
+//----------------------------------------------------
+
+void CAudioStream::ProcessThread(PVOID v)
 {
-	// TODO: CAudioStream::sub_10066700 10066700
+	// TODO: CAudioStream::ProcessThread
 }
 
-void CAudioStream::Play()
+//----------------------------------------------------
+
+BOOL CAudioStream::Play(char *szURL, float fX, float fY, float fZ, float fDistance, bool bUsePos)
 {
-	// TODO: CAudioStream::sub_10066960 10066960
+	// TODO: CAudioStream::Play
+	return FALSE;
 }
 
-void CAudioStream::ControlGameRadio()
+//----------------------------------------------------
+
+void CAudioStream::HandleGameAudio()
 {
-	// TODO: CAudioStream::sub_10066A80 10066A80
+	// TODO: CAudioStream::HandleGameAudio()
 }
 
-void CAudioStream::DrawInfo()
+//----------------------------------------------------
+
+void CAudioStream::Draw()
 {
-	// TODO: CAudioStream::sub_10066AB0 10066AB0
+	// TODO: CAudioStream::Draw()
 }
+
+//----------------------------------------------------
+
+void FUNC_10066B90(PVECTOR in, PVECTOR out)
+{
+	out->X = -in->X;
+	out->Y = in->Z;
+	out->Z = in->Y;
+}
+
+void FUNC_10066BB0(PVECTOR in, PVECTOR out)
+{
+	out->X = in->X;
+	out->Y = -in->Z;
+	out->Z = -in->Y;
+}
+
+void CAudioStream::Test3D()
+{
+	CPlayerPed* pPlayerPed = pGame->FindPlayerPed();
+	if(!pPlayerPed) return;
+
+	CAMERA_AIM *Aim = pPlayerPed->GetCurrentAim();
+	VECTOR vecResult;
+	VECTOR vecFront;
+	VECTOR vecPos;
+	BASS_3DVECTOR front;
+	BASS_3DVECTOR vel;
+
+    vecFront.X = Aim->f1x;
+    vecFront.Y = Aim->f1y;;
+    vecFront.Z = Aim->f1z;
+    vecPos.X = Aim->pos1x;
+    vecPos.Y = Aim->pos1y;
+    vecPos.Z = Aim->pos1z;
+
+	FUNC_10066BB0(&vecFront, &vecResult);
+
+	front.x = vecResult.X;
+	front.y = vecResult.Y;
+	front.z = vecResult.Z;
+
+	FUNC_10066B90(&vecPos, &vecResult);
+
+	vecFront.X = vecResult.X;
+	vecFront.Y = vecResult.Y;
+	vecFront.Z = vecResult.Z;
+
+	FUNC_10066B90(&g_vecStreamingPos, &vecResult);
+}
+
+//----------------------------------------------------

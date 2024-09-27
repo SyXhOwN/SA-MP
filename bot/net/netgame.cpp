@@ -2,6 +2,7 @@
 #include "../main.h"
 #include "../../raknet/SocketDataEncryptor.h"
 #include "../mathutils.h"
+#include "../unnamed_1.h"
 
 #define NETGAME_VERSION 4057
 
@@ -27,7 +28,7 @@ typedef struct _TRAILER_SYNC_DATA // size: 54
 	char _gap0[54];
 } TRAILER_SYNC_DATA;
 
-char unnamed_2[63];
+INCAR_SYNC_DATA icSync;
 PASSENGER_SYNC_DATA unnamed_5[MAX_PLAYERS];
 BOOL bPlayerSlotState[MAX_PLAYERS];
 BYTE byteState;
@@ -220,6 +221,47 @@ BOOL CNetGame::GetPlayerKeys(PLAYERID playerId, WORD *udAnalog, WORD *lrAnalog, 
 	}
 }
 
+float CNetGame::GetPlayerFacingAngle(PLAYERID playerId)
+{
+	if(playerId >= MAX_PLAYERS) return 0.0f;
+	if(bPlayerSlotState[playerId] == FALSE) return 0.0f;
+
+	MATRIX4X4 mat;
+
+	if(bytePlayerState[playerId] == PLAYER_STATE_ONFOOT)
+	{
+		QuaternionToMatrix(&unnamed_3[playerId].quatRotation, &mat);
+
+		float fZAngle = atan2(-mat.up.X, mat.up.Y) * 180.0f/PI;
+
+		// Bound it to [0, 360)
+		while(fZAngle < 0.0f) 
+			fZAngle += 360.0f;
+		while(fZAngle >= 360.0f) 
+			fZAngle -= 360.0f;
+
+		return fZAngle;
+	}
+	else if(bytePlayerState[playerId] == PLAYER_STATE_DRIVER)
+	{
+		QuaternionToMatrix(&unnamed_4[playerId].quatRotation, &mat);
+
+		float fZAngle = atan2(-mat.up.X, mat.up.Y) * 180.0f/PI;
+
+		// Bound it to [0, 360)
+		while(fZAngle < 0.0f) 
+			fZAngle += 360.0f;
+		while(fZAngle >= 360.0f) 
+			fZAngle -= 360.0f;
+
+		return fZAngle;
+	}
+	else
+	{
+		return 0.0f;
+	}
+}
+
 BYTE CNetGame::GetPlayerSpecialAction(PLAYERID playerId)
 {
 	if(playerId >= MAX_PLAYERS) return SPECIAL_ACTION_NONE;
@@ -233,7 +275,7 @@ BYTE CNetGame::GetPlayerSpecialAction(PLAYERID playerId)
 }
 
 //----------------------------------------------------
-// MATCH
+
 BOOL CNetGame::IsPlayerAdded(PLAYERID playerId)
 {
 	if(playerId >= MAX_PLAYERS) return FALSE;
@@ -242,6 +284,7 @@ BOOL CNetGame::IsPlayerAdded(PLAYERID playerId)
 }
 
 //----------------------------------------------------
+
 BOOL CNetGame::IsVehicleAdded(VEHICLEID VehicleID)
 {
 	if(VehicleID >= MAX_VEHICLES) return FALSE;
@@ -250,6 +293,7 @@ BOOL CNetGame::IsVehicleAdded(VEHICLEID VehicleID)
 }
 
 //----------------------------------------------------
+
 float CNetGame::GetDistanceFromMeToPoint(PVECTOR vecPos)
 {
 	VECTOR vecMyPos;
@@ -269,6 +313,7 @@ float CNetGame::GetDistanceFromMeToPoint(PVECTOR vecPos)
 }
 
 //----------------------------------------------------
+
 PVECTOR CNetGame::GetMyPos(PVECTOR Vector)
 {
 	if(byteState == PLAYER_STATE_ONFOOT)
@@ -292,6 +337,7 @@ PVECTOR CNetGame::GetMyPos(PVECTOR Vector)
 }
 
 //----------------------------------------------------
+
 void CNetGame::SetMyPos(PVECTOR Vector)
 {
 	if(byteState == PLAYER_STATE_ONFOOT)
@@ -309,6 +355,7 @@ void CNetGame::SetMyPos(PVECTOR Vector)
 }
 
 //----------------------------------------------------
+
 float CNetGame::GetMyZAngle()
 {
 	MATRIX4X4 mat;
@@ -343,7 +390,7 @@ float CNetGame::GetMyZAngle()
 }
 
 //----------------------------------------------------
-// MATCH
+
 void CNetGame::SetMyZAngle(float fAngle)
 {
 	//logprintf("CNetGame::SetMyZAngle(%f)", fAngle);
@@ -428,13 +475,13 @@ void CNetGame::ShutdownForGameModeRestart()
 
 	StopRecordingPlayback();
 
-	memset(unnamed_2,0,sizeof(unnamed_2));
-	memset(unnamed_3,0,sizeof(unnamed_3));
-	memset(unnamed_4,0,sizeof(unnamed_4));
-	memset(unnamed_5,0,sizeof(unnamed_5));
-	memset(&bVehicleSlotState[0],0,sizeof(BOOL)*MAX_VEHICLES);
 	memset(&ofSync,0,sizeof(ONFOOT_SYNC_DATA));
+	memset(&icSync,0,sizeof(INCAR_SYNC_DATA));
+	memset(unnamed_3, 0, sizeof(unnamed_3));
+	memset(unnamed_4, 0, sizeof(unnamed_4));
+	memset(unnamed_5, 0, sizeof(unnamed_5));
 	memset(&bPlayerSlotState[0],0,sizeof(BOOL)*MAX_PLAYERS);
+	memset(&bVehicleSlotState[0],0,sizeof(BOOL)*MAX_VEHICLES);
 	memset(&bytePlayerState[0],0,sizeof(BYTE)*MAX_PLAYERS);
 
 	m_bZoneNames = FALSE;
@@ -496,16 +543,16 @@ void CNetGame::Init(PCHAR szHostOrIp, int iPort,
 	m_bZoneNames = FALSE;
 	m_bInstagib = FALSE;
 
-	memset(unnamed_2,0,sizeof(unnamed_2));
 	memset(&ofSync,0,sizeof(ONFOOT_SYNC_DATA));
+	memset(&icSync,0,sizeof(INCAR_SYNC_DATA));
 	memset(unnamed_3,0,sizeof(unnamed_3));
 	memset(unnamed_4,0,sizeof(unnamed_4));
 	memset(unnamed_5,0,sizeof(unnamed_5));
-	memset(&bVehicleSlotState[0],0,sizeof(BOOL)*MAX_VEHICLES);
 	memset(&bPlayerSlotState[0],0,sizeof(BOOL)*MAX_PLAYERS);
+	memset(&bVehicleSlotState[0],0,sizeof(BOOL)*MAX_VEHICLES);
 	memset(&bytePlayerState[0],0,sizeof(BYTE)*MAX_PLAYERS);
 	field_1DE = 0;
-	field_1E2 = 0;
+	field_1E2 = NULL;
 	field_1F2 = GetTickCount();
 	byteState = PLAYER_STATE_NONE;
 	field_1FA = -1;
@@ -579,6 +626,23 @@ void CNetGame::Process()
 
 	UpdateNetwork();
 
+	if(m_iGameState == GAMESTATE_CONNECTED)
+	{
+		if(m_pGameMode) m_pGameMode->Frame(fElapsedTime);
+		if(m_pScriptTimers) m_pScriptTimers->Process((DWORD)(fElapsedTime * 1000.0f));
+
+		if(bSpawned)
+		{
+			if(field_1DE)
+			{
+
+			}
+			else
+			{
+				byteState = 1;
+			}
+		}
+	}
 
 
 	// TODO: CNetGame::Process (W: 00418370 L: 080AD6A4)
@@ -619,6 +683,9 @@ void CNetGame::UpdateNetwork()
 
 		switch(packetIdentifier)
 		{
+		case ID_UNK_12:
+			Packet_Unk12(pkt);
+			break;
 		case ID_RSA_PUBLIC_KEY_MISMATCH:
 			Packet_RSAPublicKeyMismatch(pkt);
 			break;
@@ -646,6 +713,12 @@ void CNetGame::UpdateNetwork()
 		case ID_CONNECTION_REQUEST_ACCEPTED:
 			Packet_ConnectionSucceeded(pkt);
 			break;
+		case ID_PLAYER_SYNC:
+			Packet_PlayerSync(pkt);
+			break;
+		case ID_VEHICLE_SYNC:
+			Packet_VehicleSync(pkt);
+			break;
 		case ID_PASSENGER_SYNC:
 			Packet_PassengerSync(pkt);
 			break;
@@ -665,6 +738,25 @@ void CNetGame::UpdateNetwork()
 // PACKET HANDLERS INTERNAL
 //----------------------------------------------------
 
+void CNetGame::Packet_PlayerSync(Packet *p)
+{
+	RakNet::BitStream bsPlayerSync((PCHAR)p->data, p->length, false);
+	ONFOOT_SYNC_DATA ofSync;
+	BYTE bytePacketID=0;
+	PLAYERID playerId=0;
+
+	if(GetGameState() != GAMESTATE_CONNECTED) return;
+
+	memset(&ofSync,0,sizeof(ONFOOT_SYNC_DATA));
+
+	bsPlayerSync.Read(bytePacketID);
+	bsPlayerSync.Read(playerId);
+
+	// TODO: CNetGame::Packet_PlayerSync
+}
+
+//----------------------------------------------------
+
 void CNetGame::Packet_AimSync(Packet *p)
 {
 	RakNet::BitStream bsAimSync((PCHAR)p->data, p->length, false);
@@ -677,6 +769,13 @@ void CNetGame::Packet_AimSync(Packet *p)
 	bsAimSync.Read(bytePacketID);
 	bsAimSync.Read(bytePlayerID);
 	bsAimSync.Read((PCHAR)&aimSync,sizeof(AIM_SYNC_DATA));
+}
+
+//----------------------------------------------------
+
+void CNetGame::Packet_VehicleSync(Packet *p)
+{
+	// TODO: CNetGame::Packet_VehicleSync
 }
 
 //----------------------------------------------------
@@ -831,6 +930,35 @@ void CNetGame::Packet_ConnectionSucceeded(Packet *p)
 
 //----------------------------------------------------
 
+void CNetGame::Packet_Unk12(Packet *p)
+{
+	RakNet::BitStream bsRecv((PCHAR)p->data, p->length, false);
+
+	RakNet::BitStream bsSend;
+	//bsSend.Write((BYTE)ID_UNK_12);
+
+	// TODO: CNetGame::Packet_Unk12
+}
+
+
+//----------------------------------------------------
+
+void CNetGame::UpdatePlayerScoresAndPings()
+{
+	if(!m_pRakClient) return;
+	if(!m_pRakClient->IsConnected()) return;
+
+	static DWORD dwLastUpdateTick = 0;
+
+	if ((GetTickCount() - dwLastUpdateTick) > 3000) {
+		dwLastUpdateTick = GetTickCount();
+		RakNet::BitStream bsParams;
+		m_pRakClient->RPC(RPC_UpdateScoresPingsIPs, &bsParams, HIGH_PRIORITY, RELIABLE, 0, FALSE);
+	}
+}
+
+//----------------------------------------------------
+
 void CNetGame::ResetVehiclePool()
 {
 	if(m_pVehiclePool) {
@@ -870,6 +998,56 @@ void CNetGame::SendCommand(char *szCommand)
 	bsParams.Write(iStrlen);
 	bsParams.Write(szCommand, iStrlen);
 	GetRakClient()->RPC(RPC_ServerCommand,&bsParams,HIGH_PRIORITY,RELIABLE,0,false);
+}
+
+void CNetGame::StartRecordingPlayback(int iPlaybackType, char *szRecordName)
+{
+	int v5 = 0;
+
+	if(field_1E2)
+	{
+		fclose(field_1E2);
+		field_1E2 = NULL;
+	}
+
+	char s[MAX_PATH];
+	sprintf(s, "./npcmodes/recordings/%s.rec", szRecordName);
+
+	field_1E2 = fopen(s, "rb");
+	if(!field_1E2)
+	{
+		//logprintf("NPC: Total failure. Can't open recording playback file %s.", s);
+		exit(1);
+	}
+
+	fseek(field_1E2, 0, SEEK_END);
+	v5 = ftell(field_1E2);
+	rewind(field_1E2);
+
+	if(v5 == 0)
+	{
+		//logprintf("NPC: Total failure. %s is a 0 length file.", s);
+		exit(1);
+	}
+
+	int v4 = 0;
+	int v3 = 0;
+	fread(&v4, 1, sizeof(int), field_1E2);
+	fread(&v3, 1, sizeof(int), field_1E2);
+
+	if(v4 != 1000)
+	{
+		//logprintf("NPC: %s is not the correct recording version for this bot.", s);
+		//logprintf("NPC: Trying to upgrade %s...", s);
+		fclose(field_1E2);
+		if(!UpgradeRecordFile(s, v5, iPlaybackType) )
+		{
+			//logprintf("NPC: Fatal Error. Could not upgrade file. I'm out of options so I'm quiting.");
+			exit(1);
+		}
+		//logprintf("NPC: File %s was upgraded. Please restart the bot.", s);
+		exit(1);
+	}
 }
 
 void CNetGame::StopRecordingPlayback()

@@ -8,6 +8,10 @@
 
 #define GAMESTATE_RESTARTING	5
 
+#define PLAYER_RECORDING_TYPE_NONE		0
+#define PLAYER_RECORDING_TYPE_DRIVER	1
+#define PLAYER_RECORDING_TYPE_ONFOOT	2
+
 //----------------------------------------------------
 
 class CNetGame // size: 910 bytes
@@ -23,6 +27,8 @@ private:
 
 	// Packet handlers
 	void Packet_AimSync(Packet *p);
+	void Packet_PlayerSync(Packet *p);
+	void Packet_VehicleSync(Packet *p);
 	void Packet_PassengerSync(Packet *p);
 	void Packet_ConnectionSucceeded(Packet *p);
 	void Packet_RSAPublicKeyMismatch(Packet* packet);
@@ -35,6 +41,7 @@ private:
 	void Packet_ModifiedPacket(Packet* packet);
 	void Packet_ConnectAttemptFailed(Packet* packet);
 	void Packet_TrailerSync(Packet *p);
+	void Packet_Unk12(Packet *p);
 
 public:
 
@@ -95,6 +102,7 @@ public:
 
 	void Init(PCHAR szHostOrIp,int iPort,PCHAR szPlayerName,PCHAR szPass,PCHAR szNpcMode);
 	void Process();
+	void UpdatePlayerScoresAndPings();
 	void ResetVehiclePool();
 	void ResetPlayerPool();
 	void ShutdownForGameModeRestart();
@@ -112,6 +120,7 @@ public:
 	BYTE GetPlayerHealth(PLAYERID playerId);
 	BYTE GetPlayerArmour(PLAYERID playerId);
 	BOOL GetPlayerKeys(PLAYERID playerId, WORD *udAnalog, WORD *lrAnalog, WORD *wKeys);
+	float GetPlayerFacingAngle(PLAYERID playerId);
 	BYTE GetPlayerSpecialAction(PLAYERID playerId);
 	BOOL IsPlayerAdded(PLAYERID playerId);
 	BOOL IsVehicleAdded(VEHICLEID VehicleID);
@@ -121,6 +130,7 @@ public:
 	float GetMyZAngle();
 	void SetMyZAngle(float fAngle);	
 
+	void StartRecordingPlayback(int iPlaybackType, char *szRecordName);
 	void StopRecordingPlayback();
 	void PauseRecordingPlayback();
 	void ResumeRecordingPlayback();

@@ -396,4 +396,3 @@ CTaskKillPedOnFootArmed::CTaskKillPedOnFootArmed( int unk, int unk2, int unk3, i
 }
 
 //==========================================================
-

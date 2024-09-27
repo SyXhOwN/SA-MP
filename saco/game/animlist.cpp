@@ -1,5 +1,6 @@
 
 #include "../main.h"
+#include "../runutil.h"
 #include "util.h"
 
 DWORD dwAnimNameHashes[1812];
@@ -1819,6 +1820,35 @@ char szAnimNames[1812][36] = {
 	"SAMP:FISHINGIDLE", // (1811)
 };
 
+short GetAnimIndexByName(char *szAnimLib, char *szAnimName)
+{
+	short j = 0;
+
+	if(!szAnimLib || !szAnimName) return -1;
+	if(strlen(szAnimLib) + strlen(szAnimName) > 36) return -1;
+
+	char szSearch[40];
+	sprintf(szSearch, "%s:%s", szAnimLib, szAnimName);
+	Util_strupr(szSearch);
+
+	int i = 0;
+	while(j != 1812) {
+		if(!strcmp(szSearch, szAnimNames[i])) {
+			return j + 1;
+		}
+		i++;
+		j++;
+	}
+	return -1;
+}
+
+char *GetAnimNameByIndex(short index)
+{
+	if(index > 1812 || index < 1) return NULL;
+
+	return szAnimNames[index];
+}
+
 void InitAnimNameHashes()
 {
 	char szAnimLib[32];
@@ -1840,3 +1870,15 @@ void InitAnimNameHashes()
 	}
 }
 
+short GetAnimIndexByHash(DWORD dwAnimHash)
+{
+	short x = 0;
+
+	while(x != 1812) {
+		if(dwAnimNameHashes[x] == dwAnimHash) {
+			return x;
+		}
+		x++;
+	}
+	return -1;
+}

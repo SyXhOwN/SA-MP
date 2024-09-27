@@ -82,12 +82,110 @@ void con_exec()
 	}
 }
 
-void con_kick() {} // TODO: con_kick W: 0048A530 L: 0809ECB0
-void con_ban() {} // TODO: con_ban W: 0048A5D0 L: 0809ED80
-void con_banip() {} // TODO: con_banip W: 0048A740 L: 0809EF40
-void con_unbanip() {} // TODO: con_unbanip W: 0048A790 L: 0809EFB0
-void con_gmx() {} // TODO: con_gmx W: 0048A7D0 L: 0809F000
-void con_changemode() {} // TODO: con_changemode W: 0048A800 L: 0809F050
+void con_kick()
+{
+	char* arg = strtok(NULL, "");
+	if(arg)
+	{
+		CPlayerPool* pPlayerPool = pNetGame->GetPlayerPool();
+		PLAYERID playerId = atoi(arg);
+
+		if(pPlayerPool->GetSlotState(playerId))
+		{
+			RakServerInterface* pRak = pNetGame->GetRakServer();
+			PlayerID Player = pRak->GetPlayerIDFromIndex(playerId);
+			in_addr in;
+			in.s_addr = Player.binaryAddress;
+			logprintf("%s <#%d - %s> has been kicked.",pPlayerPool->GetPlayerName(playerId), playerId, inet_ntoa(in));
+			pNetGame->KickPlayer(playerId);
+		}
+	}
+}
+
+void con_ban()
+{
+	char* arg = strtok(NULL, " ");
+	if (arg)
+	{
+		CPlayerPool* pPlayerPool = pNetGame->GetPlayerPool();
+		PLAYERID playerId = atoi(arg);
+
+		if (pPlayerPool->GetSlotState(playerId))
+		{
+			RakServerInterface* pRak = pNetGame->GetRakServer();
+			PlayerID Player = pRak->GetPlayerIDFromIndex(playerId);
+			in_addr in;
+			in.s_addr = Player.binaryAddress;
+			logprintf("%s <#%d - %s> has been banned.",pPlayerPool->GetPlayerName(playerId), playerId, inet_ntoa(in));
+			pNetGame->AddBan(pPlayerPool->GetPlayerName(playerId), inet_ntoa(in), "CONSOLE BAN");
+			pNetGame->KickPlayer(playerId);
+		}
+	}
+}
+
+bool IsStrIp(char* szIn)
+{
+	char* part;
+	char tmp[16];
+	memcpy(&tmp, szIn, 16);
+	int parts = 0;
+	part = strtok(szIn, ".");
+	while (part != NULL)
+	{
+		parts++;
+		if (part != "*")
+		{
+			if (atoi(part) < 0 || atoi(part) > 255) return false;
+		}
+		part = strtok(NULL, ".");
+	}
+	if (parts != 4) return false;
+	memcpy(szIn, &tmp, 16);
+	return true;
+}
+
+void con_banip()
+{
+	char* arg = strtok(NULL, " ");
+	if (arg && IsStrIp(arg))
+	{
+		logprintf("IP %s has been banned.", arg);
+		pNetGame->AddBan("NONE", arg, "IP BAN");
+	}
+}
+
+void con_unbanip()
+{
+	char* arg = strtok(NULL, " ");
+	if (arg && IsStrIp(arg))
+	{
+		pNetGame->RemoveBan(arg);
+	}
+}
+
+extern BOOL bGameModeFinished;
+void con_gmx()
+{
+	// Gets the name of the next mode to avoid standard cycling
+	char *szMode;
+	szMode = pNetGame->GetNextScriptFile();
+	if (szMode != NULL && pNetGame->SetNextScriptFile(szMode))
+	{
+		bGameModeFinished = TRUE;
+	}
+}
+
+void con_changemode()
+{
+	char* arg = strtok(NULL, "");
+	if (arg)
+	{
+		if(pNetGame->SetNextScriptFile(arg)) {
+			bGameModeFinished = TRUE;
+		}
+		// do nothing if we can't set the requested script.
+	}
+}
 
 void con_cmdlist();
 
@@ -96,16 +194,67 @@ void con_varlist()
 	pConsole->PrintVariableList();
 }
 
-void con_say() {} // TODO: con_say W: 0048A830 L: 0809F0A0
-void con_reloadbans() {} // TODO: con_reloadbans W: 0048A880 L: 0809F110
+void con_say()
+{
+	char* arg = strtok(NULL, "");
+	char Message[255];
+	if (arg) {
+		sprintf(Message, "* Admin: %.230s", arg);
+		pNetGame->SendClientMessageToAll(0x2587CEAA, Message);
+	}
+}
 
-void con_reloadlog() {
+void con_reloadbans()
+{
+	pNetGame->LoadBanList();
+}
+
+void con_reloadlog()
+{
 	LoadLogFile();
 }
 
-void con_players() {} // TODO: con_players W: 0048A8A0 L: 0809F140
-void con_gravity() {} // TODO: con_gravity W: 0048A950 L: 0809F220
-void con_weather() {} // TODO: con_weather W: 0048A980 L: 0809F260
+void con_players()
+{
+	RakServerInterface* pRak = pNetGame->GetRakServer();
+
+	if ( pRak->GetConnectedPlayers() == 0 ) // If there is no players, why continue?
+		return;
+
+	CPlayerPool* pPlayerPool = pNetGame->GetPlayerPool();
+
+	logprintf("ID\tName\tPing\tIP");
+
+	for( int i = 0; i < MAX_PLAYERS; i++)
+	{
+		if ( pPlayerPool->GetSlotState(i) == TRUE)
+		{
+			PlayerID Player = pRak->GetPlayerIDFromIndex(i);
+			in_addr in;
+			in.s_addr = Player.binaryAddress;
+
+			logprintf("%d\t%s\t%d\t%s", i, pPlayerPool->GetPlayerName(i), pRak->GetLastPing( Player ), inet_ntoa(in));
+		}
+	}
+}
+
+void con_gravity()
+{
+	char* arg = strtok(NULL, " ");
+	if (arg)
+	{
+		pNetGame->SetGravity((float)atof(arg));
+	}
+}
+
+void con_weather()
+{
+	char* arg = strtok(NULL, " ");
+	if (arg)
+	{
+		pNetGame->SetWeather(atoi(arg));
+	}
+}
 
 void con_loadfs()
 {

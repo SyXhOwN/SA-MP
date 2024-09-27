@@ -24,7 +24,6 @@
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				StructMemberAlignment="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
@@ -33,7 +32,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="dxguid.lib d3d9.lib d3dx9.lib comctl32.lib wsock32.lib winmm.lib"
+				AdditionalDependencies="dxguid.lib d3d9.lib d3dx9.lib comctl32.lib wsock32.lib winmm.lib bass.lib"
 				OutputFile="$(OutDir)/samp.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="d3d9"
@@ -79,6 +78,7 @@
 				OmitFramePointers="TRUE"
 				AdditionalIncludeDirectories="d3d9\include\"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SACO_EXPORTS;SAMPCLI"
+				MinimalRebuild="TRUE"
 				ExceptionHandling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="1"
@@ -91,7 +91,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="dxguid.lib d3d9.lib d3dx9.lib comctl32.lib wsock32.lib winmm.lib"
+				AdditionalDependencies="dxguid.lib d3d9.lib d3dx9.lib comctl32.lib wsock32.lib winmm.lib bass.lib"
 				OutputFile="$(OutDir)/samp.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="d3d9"
@@ -127,165 +127,22 @@
 	</References>
 	<Files>
 		<Filter
-			Name="game"
-			Filter="">
-			<File
-				RelativePath=".\game\address.h">
-			</File>
-			<File
-				RelativePath=".\game\aimstuff.cpp">
-			</File>
-			<File
-				RelativePath=".\game\aimstuff.h">
-			</File>
-			<File
-				RelativePath=".\game\animlist.cpp">
-			</File>
-			<File
-				RelativePath=".\game\audio.cpp">
-			</File>
-			<File
-				RelativePath=".\game\audio.h">
-			</File>
-			<File
-				RelativePath=".\game\camera.cpp">
-			</File>
-			<File
-				RelativePath=".\game\camera.h">
-			</File>
-			<File
-				RelativePath=".\game\cheats.cpp">
-			</File>
-			<File
-				RelativePath=".\game\common.h">
-			</File>
-			<File
-				RelativePath=".\game\entity.cpp">
-			</File>
-			<File
-				RelativePath=".\game\entity.h">
-			</File>
-			<File
-				RelativePath=".\game\font.cpp">
-			</File>
-			<File
-				RelativePath=".\game\font.h">
-			</File>
-			<File
-				RelativePath=".\game\game.cpp">
-			</File>
-			<File
-				RelativePath=".\game\game.h">
-			</File>
-			<File
-				RelativePath=".\game\hooks.cpp">
-			</File>
-			<File
-				RelativePath=".\game\keystuff.cpp">
-			</File>
-			<File
-				RelativePath=".\game\keystuff.h">
-			</File>
-			<File
-				RelativePath=".\game\patches.cpp">
-			</File>
-			<File
-				RelativePath=".\game\playerped.cpp">
-			</File>
-			<File
-				RelativePath=".\game\playerped.h">
-			</File>
-			<File
-				RelativePath=".\game\rwstuff.cpp">
-			</File>
-			<File
-				RelativePath=".\game\rwstuff.h">
-			</File>
-			<File
-				RelativePath=".\game\scripting.cpp">
-			</File>
-			<File
-				RelativePath=".\game\scripting.h">
-			</File>
-			<File
-				RelativePath=".\game\task.cpp">
-			</File>
-			<File
-				RelativePath=".\game\task.h">
-			</File>
-			<File
-				RelativePath=".\game\unnamed_1.cpp">
-			</File>
-			<File
-				RelativePath=".\game\util.cpp">
-			</File>
-			<File
-				RelativePath=".\game\util.h">
-			</File>
-		</Filter>
-		<Filter
-			Name="archive"
-			Filter="">
-			<File
-				RelativePath=".\archive\ArchiveCommon.h">
-			</File>
-			<File
-				RelativePath=".\archive\ArchiveFS.cpp">
-			</File>
-			<File
-				RelativePath=".\archive\ArchiveFS.h">
-			</File>
-			<File
-				RelativePath=".\archive\CryptoContext.cpp">
-			</File>
-			<File
-				RelativePath=".\archive\CryptoContext.h">
-			</File>
-			<File
-				RelativePath=".\archive\CryptoFns.cpp">
-			</File>
-			<File
-				RelativePath=".\archive\CryptoFns.h">
-			</File>
-			<File
-				RelativePath=".\archive\Hasher.cpp">
-			</File>
-			<File
-				RelativePath=".\archive\Hasher.h">
-			</File>
-			<File
-				RelativePath=".\archive\KeyPair.cpp">
-			</File>
-			<File
-				RelativePath=".\archive\KeyPair.h">
-			</File>
-			<File
-				RelativePath=".\archive\Obfuscator.h">
-			</File>
-			<File
-				RelativePath=".\archive\Signer.cpp">
-			</File>
-			<File
-				RelativePath=".\archive\Signer.h">
-			</File>
-			<File
-				RelativePath=".\archive\Stream.h">
-			</File>
-			<File
-				RelativePath=".\archive\TinyEncrypt.cpp">
-			</File>
-			<File
-				RelativePath=".\archive\TinyEncrypt.h">
-			</File>
-		</Filter>
-		<Filter
 			Name="net"
 			Filter="">
 			<File
 				RelativePath=".\net\actorpool.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="4"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\net\actorpool.h">
+			</File>
+			<File
+				RelativePath=".\events.cpp">
 			</File>
 			<File
 				RelativePath=".\net\gangzonepool.cpp">
@@ -318,6 +175,12 @@
 				RelativePath=".\net\netgame.h">
 			</File>
 			<File
+				RelativePath=".\net\netplayer.cpp">
+			</File>
+			<File
+				RelativePath=".\net\netplayer.h">
+			</File>
+			<File
 				RelativePath=".\net\netrpc.cpp">
 			</File>
 			<File
@@ -337,9 +200,21 @@
 			</File>
 			<File
 				RelativePath=".\net\playerpool.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="4"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\net\playerpool.h">
+			</File>
+			<File
+				RelativePath=".\net\remoteplayer.cpp">
+			</File>
+			<File
+				RelativePath=".\net\remoteplayer.h">
 			</File>
 			<File
 				RelativePath=".\net\scriptrpc.cpp">
@@ -358,16 +233,6 @@
 			</File>
 			<File
 				RelativePath=".\net\vehiclepool.h">
-			</File>
-		</Filter>
-		<Filter
-			Name="ttmath"
-			Filter="">
-			<File
-				RelativePath="..\ttmath\ttmathuint.h">
-			</File>
-			<File
-				RelativePath="..\ttmath\ttmathuint_x86.h">
 			</File>
 		</Filter>
 		<Filter
@@ -396,6 +261,12 @@
 			</File>
 			<File
 				RelativePath="..\raknet\BitStream.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="4"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\raknet\BitStream.h">
@@ -408,6 +279,12 @@
 			</File>
 			<File
 				RelativePath="..\raknet\CheckSum.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="4"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\raknet\CheckSum.h">
@@ -417,6 +294,12 @@
 			</File>
 			<File
 				RelativePath="..\raknet\CommandParserInterface.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="4"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\raknet\CommandParserInterface.h">
@@ -468,6 +351,12 @@
 			</File>
 			<File
 				RelativePath="..\raknet\DS_HuffmanEncodingTree.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="4"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\raknet\DS_HuffmanEncodingTree.h">
@@ -573,6 +462,12 @@
 			</File>
 			<File
 				RelativePath="..\raknet\InternalPacketPool.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="4"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\raknet\InternalPacketPool.h">
@@ -591,6 +486,12 @@
 			</File>
 			<File
 				RelativePath="..\raknet\LightweightDatabaseServer.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="4"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\raknet\LightweightDatabaseServer.h">
@@ -654,6 +555,12 @@
 			</File>
 			<File
 				RelativePath="..\raknet\PacketLogger.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="4"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\raknet\PacketLogger.h">
@@ -675,6 +582,12 @@
 			</File>
 			<File
 				RelativePath="..\raknet\RakClient.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="4"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\raknet\RakClient.h">
@@ -699,6 +612,12 @@
 			</File>
 			<File
 				RelativePath="..\raknet\RakNetTransport.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="4"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\raknet\RakNetTransport.h">
@@ -711,6 +630,12 @@
 			</File>
 			<File
 				RelativePath="..\raknet\RakPeer.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="4"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\raknet\RakPeer.h">
@@ -741,6 +666,12 @@
 			</File>
 			<File
 				RelativePath="..\raknet\ReliabilityLayer.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="4"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\raknet\ReliabilityLayer.h">
@@ -792,6 +723,12 @@
 			</File>
 			<File
 				RelativePath="..\raknet\SHA1.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="4"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\raknet\SHA1.h">
@@ -885,8 +822,220 @@
 			</File>
 		</Filter>
 		<Filter
+			Name="archive"
+			Filter="">
+			<File
+				RelativePath=".\archive\ArchiveCommon.h">
+			</File>
+			<File
+				RelativePath=".\archive\ArchiveFS.cpp">
+			</File>
+			<File
+				RelativePath=".\archive\ArchiveFS.h">
+			</File>
+			<File
+				RelativePath=".\archive\CryptoContext.cpp">
+			</File>
+			<File
+				RelativePath=".\archive\CryptoContext.h">
+			</File>
+			<File
+				RelativePath=".\archive\CryptoFns.cpp">
+			</File>
+			<File
+				RelativePath=".\archive\CryptoFns.h">
+			</File>
+			<File
+				RelativePath=".\archive\Hasher.cpp">
+			</File>
+			<File
+				RelativePath=".\archive\Hasher.h">
+			</File>
+			<File
+				RelativePath=".\archive\KeyPair.cpp">
+			</File>
+			<File
+				RelativePath=".\archive\KeyPair.h">
+			</File>
+			<File
+				RelativePath=".\archive\Obfuscator.h">
+			</File>
+			<File
+				RelativePath=".\archive\Signer.cpp">
+			</File>
+			<File
+				RelativePath=".\archive\Signer.h">
+			</File>
+			<File
+				RelativePath=".\archive\TinyEncrypt.cpp">
+			</File>
+			<File
+				RelativePath=".\archive\TinyEncrypt.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="game"
+			Filter="">
+			<File
+				RelativePath=".\game\actorped.cpp">
+			</File>
+			<File
+				RelativePath=".\game\actorped.h">
+			</File>
+			<File
+				RelativePath=".\game\address.h">
+			</File>
+			<File
+				RelativePath=".\game\aimstuff.cpp">
+			</File>
+			<File
+				RelativePath=".\game\aimstuff.h">
+			</File>
+			<File
+				RelativePath=".\game\animlist.cpp">
+			</File>
+			<File
+				RelativePath=".\game\audio.cpp">
+			</File>
+			<File
+				RelativePath=".\game\audio.h">
+			</File>
+			<File
+				RelativePath=".\game\camera.cpp">
+			</File>
+			<File
+				RelativePath=".\game\camera.h">
+			</File>
+			<File
+				RelativePath=".\game\cheats.cpp">
+			</File>
+			<File
+				RelativePath=".\game\common.h">
+			</File>
+			<File
+				RelativePath=".\game\debug.cpp">
+			</File>
+			<File
+				RelativePath=".\game\debug.h">
+			</File>
+			<File
+				RelativePath=".\game\entity.cpp">
+			</File>
+			<File
+				RelativePath=".\game\entity.h">
+			</File>
+			<File
+				RelativePath=".\game\font.cpp">
+			</File>
+			<File
+				RelativePath=".\game\font.h">
+			</File>
+			<File
+				RelativePath=".\game\game.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="2"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\game\game.h">
+			</File>
+			<File
+				RelativePath=".\game\hooks.cpp">
+			</File>
+			<File
+				RelativePath=".\game\keystuff.cpp">
+			</File>
+			<File
+				RelativePath=".\game\keystuff.h">
+			</File>
+			<File
+				RelativePath=".\game\menu.cpp">
+			</File>
+			<File
+				RelativePath=".\game\menu.h">
+			</File>
+			<File
+				RelativePath=".\game\modelinfo.cpp">
+			</File>
+			<File
+				RelativePath=".\game\modelinfo.h">
+			</File>
+			<File
+				RelativePath=".\game\object.cpp">
+			</File>
+			<File
+				RelativePath=".\game\object.h">
+			</File>
+			<File
+				RelativePath=".\game\patches.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="2"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\game\playerped.cpp">
+			</File>
+			<File
+				RelativePath=".\game\playerped.h">
+			</File>
+			<File
+				RelativePath=".\game\rwstuff.cpp">
+			</File>
+			<File
+				RelativePath=".\game\rwstuff.h">
+			</File>
+			<File
+				RelativePath=".\game\scripting.cpp">
+			</File>
+			<File
+				RelativePath=".\game\scripting.h">
+			</File>
+			<File
+				RelativePath=".\game\task.cpp">
+			</File>
+			<File
+				RelativePath=".\game\task.h">
+			</File>
+			<File
+				RelativePath=".\game\textdraw.cpp">
+			</File>
+			<File
+				RelativePath=".\game\textdraw.h">
+			</File>
+			<File
+				RelativePath=".\game\textures.cpp">
+			</File>
+			<File
+				RelativePath=".\game\textures.h">
+			</File>
+			<File
+				RelativePath=".\game\util.cpp">
+			</File>
+			<File
+				RelativePath=".\game\util.h">
+			</File>
+			<File
+				RelativePath=".\game\vehicle.cpp">
+			</File>
+			<File
+				RelativePath=".\game\vehicle.h">
+			</File>
+		</Filter>
+		<Filter
 			Name="d3dhook"
 			Filter="">
+			<File
+				RelativePath=".\d3dhook\ID3DXFontHook.cpp">
+			</File>
+			<File
+				RelativePath=".\d3dhook\ID3DXFontHook.h">
+			</File>
 			<File
 				RelativePath=".\d3dhook\IDirect3DDevice9Hook.cpp">
 			</File>
@@ -972,6 +1121,12 @@
 			</File>
 			<File
 				RelativePath=".\d3d9\common\DXUTgui.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="4"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\d3d9\common\DXUTgui.h">
@@ -1018,12 +1173,24 @@
 			</File>
 			<File
 				RelativePath=".\unkclass13.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="4"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\unkclass13.h">
 			</File>
 			<File
 				RelativePath=".\unkclass14.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="4"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\unkclass14.h">
@@ -1042,6 +1209,12 @@
 			</File>
 			<File
 				RelativePath=".\unkclass4.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="4"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\unkclass4.h">
@@ -1084,6 +1257,9 @@
 			RelativePath=".\cmdprocs.cpp">
 		</File>
 		<File
+			RelativePath=".\cmdprocs.h">
+		</File>
+		<File
 			RelativePath=".\cmdwindow.cpp">
 		</File>
 		<File
@@ -1097,6 +1273,12 @@
 		</File>
 		<File
 			RelativePath=".\deathwindow.cpp">
+			<FileConfiguration
+				Name="Release|Win32">
+				<Tool
+					Name="VCCLCompilerTool"
+					Optimization="4"/>
+			</FileConfiguration>
 		</File>
 		<File
 			RelativePath=".\deathwindow.h">
@@ -1139,6 +1321,9 @@
 		</File>
 		<File
 			RelativePath=".\fontrender.h">
+		</File>
+		<File
+			RelativePath=".\gpci.cpp">
 		</File>
 		<File
 			RelativePath=".\helpdialog.cpp">
@@ -1184,6 +1369,9 @@
 		</File>
 		<File
 			RelativePath=".\newplayertags.h">
+		</File>
+		<File
+			RelativePath=".\outputdebugstring.h">
 		</File>
 		<File
 			RelativePath=".\playertags.cpp">

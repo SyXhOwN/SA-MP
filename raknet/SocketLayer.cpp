@@ -25,6 +25,8 @@
 #include <assert.h>
 #include "MTUSize.h"
 
+#include "SocketDataEncryptor.h"
+ 
 #ifdef _WIN32
 #include <process.h>
 #define COMPATIBILITY_2_RECV_FROM_FLAGS 0
@@ -47,6 +49,9 @@ typedef int socklen_t;
 #ifdef _MSC_VER
 #pragma warning( push )
 #endif
+
+unsigned char pDataBuffer[16384];
+unsigned char pDataBuffer2[16384]; // unused
 
 bool SocketLayer::socketLayerStarted = false;
 #ifdef _WIN32
@@ -370,6 +375,10 @@ bool SocketLayer::AssociateSocketWithCompletionPortAndRead( SOCKET readSocket, u
 	return true;
 }
 
+#ifdef SAMPSRV
+	int ProcessQueryPacket(unsigned int binaryAddress, unsigned short port, char *data, int length, SOCKET s);
+#endif
+
 int SocketLayer::RecvFrom( const SOCKET s, RakPeer *rakPeer, int *errorCode )
 {
 	int len;
@@ -396,6 +405,7 @@ int SocketLayer::RecvFrom( const SOCKET s, RakPeer *rakPeer, int *errorCode )
 	// if (len>0)
 	//  printf("Got packet on port %i\n",ntohs(sa.sin_port));
 
+	/*
 	if ( len == 0 )
 	{
 #ifdef _DEBUG
@@ -405,7 +415,7 @@ int SocketLayer::RecvFrom( const SOCKET s, RakPeer *rakPeer, int *errorCode )
 
 		*errorCode = SOCKET_ERROR;
 		return SOCKET_ERROR;
-	}
+	}*/
 
 	if ( len != SOCKET_ERROR )
 	{
@@ -414,8 +424,30 @@ int SocketLayer::RecvFrom( const SOCKET s, RakPeer *rakPeer, int *errorCode )
 		//strcpy(ip, inet_ntoa(sa.sin_addr));
 		//if (strcmp(ip, "0.0.0.0")==0)
 		// strcpy(ip, "127.0.0.1");
-		ProcessNetworkPacket( sa.sin_addr.s_addr, portnum, data, len, rakPeer );
 
+		if (len > 0)
+		{
+
+#ifdef SAMPSRV
+			// QUERY PACKETS ARE NOT COMPRESSED
+			//logprintf("Raw ID: %c:%u",data[0],data[0]);
+
+			if(ProcessQueryPacket(sa.sin_addr.s_addr, portnum,(char*)data, len, s)) {
+				return 1;
+			}
+
+			if(!SocketDataEncryptor::Decrypt(pDataBuffer,(unsigned char *)data, &len) )
+			{
+				*errorCode = 0;
+				return 1;
+			}
+
+			ProcessNetworkPacket( sa.sin_addr.s_addr, portnum, (char*)pDataBuffer, len, rakPeer );
+#else
+			ProcessNetworkPacket( sa.sin_addr.s_addr, portnum, data, len, rakPeer );
+#endif
+
+		}
 		return 1;
 	}
 	else
@@ -481,10 +513,19 @@ int SocketLayer::SendTo( SOCKET s, const char *data, int length, unsigned int bi
 	sa.sin_addr.s_addr = binaryAddress;
 	sa.sin_family = AF_INET;
 
+#ifndef SAMPSRV
+
+	SocketDataEncryptor::Encrypt(pDataBuffer, (unsigned char *)data, &length);
+
+#endif
+
 	do
 	{
-		// TODO - use WSASendTo which is faster.
+#ifndef SAMPSRV
+		len = sendto( s, (char *)pDataBuffer, length, 0, ( const sockaddr* ) & sa, sizeof( struct sockaddr_in ) );
+#else
 		len = sendto( s, data, length, 0, ( const sockaddr* ) & sa, sizeof( struct sockaddr_in ) );
+#endif
 	}
 	while ( len == 0 );
 

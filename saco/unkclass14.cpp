@@ -26,3 +26,14 @@ void CUnkClass14::RestoreDeviceObjects()
 	D3DXCreateSprite(m_pD3DDevice, &m_pD3DSprite1);
 	D3DXCreateSprite(m_pD3DDevice, &m_pD3DSprite2);
 }
+
+void CUnkClass14::FUNC_100708B0()
+{
+	//D3DXCreateFontA();
+
+	//LPD3DXRENDERTOSURFACE;
+	//D3DXCreateRenderToSurface();
+	//D3DXCreateTexture();
+	//D3DXCreateFont();
+	//m_pD3DDevice->Clear(Count, pRects, Flags, Color, Z, Stencil);
+}

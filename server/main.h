@@ -41,9 +41,11 @@
 
 	#include <windows.h>
 	#include <mmsystem.h>
+	#include <shellapi.h>
 	#include <time.h>
 #else
 	#define SLEEP(x) { usleep(x * 1000); }
+	#define MAX_PATH 260
 
 	#ifndef stricmp
 		#define stricmp strcasecmp
@@ -89,9 +91,12 @@ typedef unsigned short VEHICLEID;
 #include "netrpc.h"
 #include "player.h"
 #include "playerpool.h"
+#include "vehicle.h"
 #include "vehiclepool.h"
 #include "pickuppool.h"
+#include "object.h"
 #include "objectpool.h"
+#include "menu.h"
 #include "menupool.h"
 #include "textdrawpool.h"
 #include "labelpool.h"

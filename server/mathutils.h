@@ -1,7 +1,7 @@
 
-bool unnamed_1(PVECTOR vec); // unused
-bool unnamed_2(PVECTOR vec);
-bool unnamed_3(PVECTOR vec);
+bool unnamed_func_1(PVECTOR vec); // unused
+bool unnamed_func_2(PVECTOR vec);
+bool unnamed_func_3(PVECTOR vec);
 float GetLength(PVECTOR vec);
 void CrossProduct(PVECTOR out, PVECTOR vec1, PVECTOR vec2); // unused
 void Transform(PVECTOR out, PMATRIX4X4 mat, PVECTOR vec); // unused
@@ -12,4 +12,3 @@ void QuaternionToMatrix(PQUATERNION quat, PMATRIX4X4 mat);
 float GetNormalisation(PVECTOR vec);
 void ToQuaternion(PVECTOR vec, PQUATERNION quat); // unused
 void ToEulerAngles(PQUATERNION quat, PVECTOR vec); // unused
-

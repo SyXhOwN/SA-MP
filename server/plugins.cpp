@@ -141,6 +141,85 @@ CPlugins::~CPlugins()
 
 //---------------------------------------
 
+void CPlugins::ConvertFromHex(unsigned char* pbBuffer, char* szData, unsigned int dwMaxLength)
+{
+	unsigned int i=0, dwTemp=0;
+	char szTemp[4] = {0,0,0,0};
+	while(szData[i]!=0)
+	{
+		if ((i/2) >= dwMaxLength)
+			break;
+		if (szData[i+0]==0 || szData[i+1]==0)
+			break;
+		szTemp[0] = szData[i+0];
+		szTemp[1] = szData[i+1];
+		sscanf(szTemp, "%X", &dwTemp);
+		pbBuffer[i/2] = dwTemp;
+		i+=2;
+	}
+}
+
+//---------------------------------------
+
+/*bool CPlugins::VerifyPluginSignature(char* szPluginFilename)
+{
+	CSHA1 sha1;
+	sha1.HashFile(szPluginFilename);
+	sha1.Final();
+	BYTE* pbHash = sha1.GetHash();
+
+	// TODO: CPlugins::VerifyPluginSignature
+}*/
+
+//---------------------------------------
+
+bool CPlugins::IsValidForNoSign(char* szFilename)
+{
+	char szLCFilename[MAX_PATH];
+
+	int i = 0, j = 0;
+	for(i=strlen(szFilename)-1; i>=0; i--)
+	{
+		if (szFilename[i] == '.')
+		{
+			j=i;
+		}
+		if (szFilename[i] == '\\' || szFilename[i] == '/')
+		{
+			i++;
+			break;
+		}
+	}
+
+	strcpy(szLCFilename, szFilename+i);		// Get part of filename with the \ or /
+	szLCFilename[j-i] = 0;					// Get rid of extension
+
+	char *szNoSign = pConsole->GetStringVariable("nosign");
+	char *szLCNoSign = new char[strlen(szNoSign)+1];
+	strcpy(szLCNoSign, szNoSign);
+
+	char *szTok = strtok(szLCNoSign, " ");
+	while(szTok)
+	{
+#ifdef LINUX
+		if (strcmp(szTok, szLCFilename)==0)
+#else
+		if (strcmpi(szTok, szLCFilename)==0)
+#endif
+		{
+			delete[] szLCNoSign;
+			return true;
+		}
+		szTok = strtok(NULL, " ");
+	}
+
+	delete[] szLCNoSign;
+
+	return false;
+}
+
+//---------------------------------------
+
 BOOL CPlugins::LoadSinglePlugin(char *szPluginPath)
 {
 	// Load it

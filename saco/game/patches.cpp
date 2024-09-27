@@ -4,6 +4,7 @@
 DWORD dwSystemMemory;
 DWORD dwStreamingMemory;
 
+void InstallSCMEventsProcessor();
 void RelocateScanListHack();
 void RelocatePedsListHack();
 void RelocateBaseModelInfoHack();
@@ -440,6 +441,42 @@ void ApplyVehicleColorPatches()
 
 //----------------------------------------------------------
 
+void InstallGameAndGraphicsLoopHooks();
+
+void ApplyDebugLevelPatches()
+{
+	// hack to remove motion blur in high speed vehicle
+	UnFuck(0x704E8A,5);
+	memset((PVOID)0x704E8A,0x90,5);
+
+	// Don't go back to player anims, use the peds IDE
+	UnFuck(0x609A4E,6);
+	memset((PVOID)0x609A4E, 0x90, 6);
+
+	InstallGameAndGraphicsLoopHooks();
+	RelocateScanListHack();
+	RelocatePedsListHack();
+	ApplyVehicleColorPatches();
+	RelocateBaseModelInfoHack();
+	ApplyGameLimitPatches();
+
+	UnFuck(0x47BF54,4);
+	InstallSCMEventsProcessor();
+}
+
+//----------------------------------------------------------
+
+BYTE pbyteTrainDelrailmentPatch[] = {
+	0xB8, 0x89, 0x8F, 0x6F, 0x00, 0xFF, 0xE0
+};
+
+float GLOBAL_101166F0 = 20000.0f;
+float GLOBAL_101166F4 = -20000.0f;
+
+float GLOBAL_10116714 = 0.14f;
+float GLOBAL_10116718 = 2.0f;
+float GLOBAL_1011671C = 10000.0f;
+
 extern DWORD dwFarClipHookAddr;
 extern DWORD dwFarClipReturnAddr;
 
@@ -455,9 +492,331 @@ void ApplyInGamePatches()
 
 	RelocateScanListHack();
 	RelocatePedsListHack(); // allows us to use all 300 ped model slots
-
+	ApplyVehicleColorPatches();
 	RelocateBaseModelInfoHack();
+	ApplyGameLimitPatches();
 
+	UnFuck(0x4DF7E2,2);
+	memset((PVOID)0x4DF7E2,0x90,5);
+
+	// VehicleStruct increase
+	UnFuck(0x5B8FE4,1);
+	*(BYTE*)0x5B8FE4 = 127;
+
+	UnFuck(0x5720A5,5);
+	memset((PVOID)0x5720A5,0x90,5);
+
+	// Remove random procedural geometry like plants/rocks etc.
+	UnFuck(0x53C159,5);
+	memset((PVOID)0x53C159,0x90,5);
+
+	UnFuck(0x53C136,5);
+	memset((PVOID)0x53C136,0x90,5);
+
+	// Automatic go-to-menu on alt+tab
+	if(iGtaVersion == GTASA_VERSION_USA10) {
+		UnFuck(0x748063, 5);
+		memset((PVOID)0x748063, 0x90, 5);
+	} else {
+		UnFuck(0x7480B3, 5);
+		memset((PVOID)0x7480B3, 0x90, 5);
+	}
+
+	// No vehicle name rendering
+	UnFuck(0x58FBE9,5);
+    memset((PVOID)0x58FBE9,0x90,5);
+
+	// No playidles anim loading.
+	UnFuck(0x86D1EC,1);
+	*(BYTE*)0x86D1EC = '\0';
+
+	// Prevent replays
+	UnFuck(0x53C090,5);
+	memset((PVOID)0x53C090,0x90,5);
+
+	// NO MORE INTERIOR PEDS
+	UnFuck(0x440833,8);
+	memset((PVOID)0x440833,0x90,8);
+
+	// caused 0x706B2E crash (This seems to be ped shadow rendering)
+	UnFuck(0x53EA08,10);
+	memset((PVOID)0x53EA08,0x90,10);
+
+	// Make the shadows slightly darker by increasing the alpha
+	UnFuck(0x71162C,1);
+	*(PBYTE)0x71162C = 80;
+
+	// Unknown from CPlayerPed::ProcessControl causes crash
+	UnFuck(0x609C08,39);
+	memset((PVOID)0x609C08,0x90,39);
+
+	// FindPlayerVehicle (Always use nPlayerPed)
+	UnFuck(0x56E0FA,18);
+	memset((PVOID)0x56E0FA,0x90,18);
+
+	// CMotorBike::ProcessControlInputs.. why oh why..
+	UnFuck(0x6BC9EB,2);
+	memset((PVOID)0x6BC9EB,0x90,2);
+
+	// Smallish patch to fix the drown-in-vehicle crash
+	UnFuck(0x4BC6C1,3);
+	*(BYTE*)0x4BC6C1 = 0xB0;
+	*(BYTE*)0x4BC6C2 = 0x00;
+	*(BYTE*)0x4BC6C3 = 0x90;
+
+	// Allow all vehicles to be sprayed;
+	UnFuck(0x44AC75,5);
+	memset((PVOID)0x44AC75,0x90,5);
+	*(BYTE*)0x44AC75 = 0xB0;
+	*(BYTE*)0x44AC76 = 0x01;
+
+	// This removes the random weapon pickups (e.g. on the hill near chilliad)
+	UnFuck(0x5B47B0,1);
+	memset((PVOID)0x5B47B0,0xC3,1);
+
+	// Removes the FindPlayerInfoForThisPlayerPed at these locations.
+	UnFuck(0x5E63A6,19);
+	memset((PVOID)0x5E63A6,0x90,19);
+
+	UnFuck(0x621AEA,12);
+	memset((PVOID)0x621AEA,0x90,12);
+
+	UnFuck(0x62D331,11);
+	memset((PVOID)0x62D331,0x90,11);
+
+	UnFuck(0x741FFF,27);
+	memset((PVOID)0x741FFF,0x90,27);
+
+	// hack to remove motion blur in high speed vehicle
+	UnFuck(0x704E8A,5);
+	memset((PVOID)0x704E8A,0x90,5);
+
+	// Respawn and Interior
+	UnFuck(0x4090A0,1);
+	*(BYTE*)0x4090A0 = 0xC3;
+
+	// Respawn and Interior
+	UnFuck(0x441482,5);
+	memset((void*)0x441482, 0x90, 5);
+
+	// No MessagePrint
+	UnFuck(0x588BE0,1);
+	*(BYTE*)0x588BE0 = 0xC3;
+
+	// No IPL vehicle
+	UnFuck(0x53C06A,5);
+	memset((PVOID)0x53C06A,0x90,5);
+
+	// SomeCarGenerator (0x41a8b3 crash)
+	UnFuck(0x434272,5);
+	memset((PVOID)0x434272,0x90,5);
+
+	// CPlayerPed_CPlayerPed .. task system corrupts some shit
+	UnFuck(0x60D64D,2);
+	*(PBYTE)0x60D64E = 0x84; // jnz to jz
+
+	// CPhysical Destructor (705b3b crash)
+	UnFuck(0x542485,11);
+	memset((PVOID)0x542485,0x90,11);
+
+	// No peds kthx. (CPopulation::AddPed() nulled)
+	UnFuck(0x612710,3);
+	*(BYTE*)0x612710 = 0x33;
+	*(BYTE*)0x612711 = 0xC0; // xor eax, eax
+	*(BYTE*)0x612712 = 0xC3; // ret
+
+	// Fuck the call to CPopulation::AddPed() for create_train off to kingdom kong	
+	UnFuck(0x613BA7, 5);
+	memset((PVOID)0x613BA7, 0x90, 5);
+
+	// Don't go back to player anims, use the peds IDE
+	UnFuck(0x609A4E,6);
+	memset((PVOID)0x609A4E, 0x90, 6);
+
+	// Train derailment 
+	UnFuck(0x006F8CF8, 12);
+	memset((PVOID)0x006F8CF8, 0x90, 5); // (Actual hook is installed in hooks.cpp)
+	memcpy((PVOID)(0x006F8CF8+5), pbyteTrainDelrailmentPatch, sizeof(pbyteTrainDelrailmentPatch));
+
+	// CarCtl::GenerateRandomCars nulled from CGame::Process (firetrucks etc)
+	UnFuck(0x53C1C1,5);
+	memset((PVOID)0x53C1C1,0x90,5);
+
+	// (540040 bug), test ecx for 0 instead of [ecx+270]
+	UnFuck(0x540040,10);
+	// nop the first 8 bytes
+	memset((PVOID)0x540040,0x90,6);
+	*(PBYTE)0x540046 = 0x85;
+	*(PBYTE)0x540047 = 0xC9; // test ecx, ecx
+	*(PBYTE)0x540048 = 0x74; // jz
+
+	// No wasted message
+	UnFuck(0x56E5AD,5);
+	memset((PVOID)0x56E5AD,0x90,5);
+
+	// For the input disabling in CGame.
+	UnFuck(0x541DF5,5);
+
+	// Ret at CCamera::ClearPlayerWeaponMode
+	UnFuck(0x609CB4,5);
+	memset((PVOID)0x609CB4,0x90,5);
+
+	// PlayerInfo checks in CPlayerPed::ProcessControl
+	UnFuck(0x60F2C4,25);
+	memset((PVOID)0x60F2C4,0x90,25);
+
+	// No Vehicle Audio Processing (done manually from the hooks)
+	UnFuck(0x6B18F1,5);
+	memset((PVOID)0x6B18F1,0x90,5);
+	UnFuck(0x6B9298,5);
+	memset((PVOID)0x6B9298,0x90,5);
+	UnFuck(0x6F1793,5);
+	memset((PVOID)0x6F1793,0x90,5);
+	UnFuck(0x6F86B6,5);
+	memset((PVOID)0x6F86B6,0x90,5);
+
+	// camera_on_actor patch, tsk tsk R*
+	UnFuck(0x0047C477,1);
+	*(BYTE*)0x0047C477 = 0xEB;
+
+	// CPushBike fires set on CPed patch
+	UnFuck(0x0053A984,2);
+	*(BYTE*)0x0053A984 = 0xEB;  // jmp
+	*(BYTE*)0x0053A985 = 0x77;  // +77h = 0x0053A9FD
+
+	// Stop sniper clicking
+	UnFuck(0x0060F289, 8);
+	memset((PVOID)0x0060F289, 0x90, 8);
+	UnFuck(0x0060F29D, 19);
+	memset((PVOID)0x0060F29D, 0x90, 19);
+
+	// Wanted level hook
+	UnFuck(0x58DB5F, 9);
+	*(BYTE*)0x58DB5F = 0xBD;
+	*(BYTE*)0x58DB60 = 0x00;
+	*(BYTE*)0x58DB61 = 0x00;
+	*(BYTE*)0x58DB62 = 0x00;
+	*(BYTE*)0x58DB63 = 0x00;
+	*(BYTE*)0x58DB64 = 0x90;
+	*(BYTE*)0x58DB65 = 0x90;
+	*(BYTE*)0x58DB66 = 0x90;
+	*(BYTE*)0x58DB67 = 0x90;
+
+	// Remove the blue(-ish) fog in the map
+	UnFuck(0x00575B0E, 5);
+	memset((PVOID)0x00575B0E, 0x90, 5);
+
+	// Remove the CReferences call from CTaskEnterVehicleDriver ctor
+	UnFuck(0x63ADC8,6);
+	memset((PVOID)0x63ADC8,0x90,6);
+
+	UnFuck(0x58FC2E,30);
+	memset((PVOID)0x58FC2E,0x90,30);
+
+	UnFuck(0x5E1E70,2);
+	*(BYTE*)0x5E1E70 = 0x33;
+	*(BYTE*)0x5E1E71 = 0xC0;
+
+	UnFuck(0x6A8500,119);
+	memset((PVOID)0x6A8500,0xC3,119);
+
+	UnFuck(0x593D7C,5);
+	memset((PVOID)0x593D7C,0x90,5);
+
+	if(iGtaVersion == GTASA_VERSION_USA10) {
+		UnFuck(0x7469AF,2);
+		*(BYTE*)0x7469AF = 0x33;
+		*(BYTE*)0x7469B0 = 0xC0;
+	} else {
+		UnFuck(0x7469FF,2);
+		*(BYTE*)0x7469FF = 0x33;
+		*(BYTE*)0x746A00 = 0xC0;
+	}
+
+	UnFuck(0x61E0C2,4);
+	*(DWORD*)0x61E0C2 = (DWORD)&GLOBAL_10116718;
+
+	UnFuck(0x454CC9,4);
+	*(DWORD*)0x454CC9 = (DWORD)&GLOBAL_1011671C;
+
+	UnFuck(0x5952A6,5);
+	memset((PVOID)0x5952A6,0x90,5);
+
+	// Stop ped rotations from the camera
+	UnFuck(0x6884C4,6);
+	UnFuck(0x688200,6);
+	memset((PVOID)0x6884C4,0x90,6);
+	memset((PVOID)0x688200,0x90,6);
+
+	UnFuck(0x570535,15);
+	memset((PVOID)0x570535,0x90,15);
+
+	UnFuck(0x5E7847,17);
+	memset((PVOID)0x5E7847,0x90,17);
+
+	UnFuck(0x570546,175);
+	memset((PVOID)0x570546,0x90,175);
+
+	UnFuck(0x6D1874,24);
+	*(DWORD*)0x6D1874 = 0x6D17D5;
+	*(DWORD*)0x6D1878 = 0x6D17D5;
+	*(DWORD*)0x6D187C = 0x6D17D5;
+	*(DWORD*)0x6D1880 = 0x6D17D5;
+	*(DWORD*)0x6D1884 = 0x6D17D5;
+	*(DWORD*)0x6D1888 = 0x6D17D5;
+
+	UnFuck(0x64DB49,9);
+	memset((PVOID)0x64DB49,0x90,9);
+
+	UnFuck(0x64BC9F,9);
+	memset((PVOID)0x64BC9F,0x90,9);
+
+	UnFuck(0x64B872,9);
+	memset((PVOID)0x64B872,0x90,9);
+
+	UnFuck(0x5E7D62,5);
+	*(BYTE*)0x5E7D62 = 0x5E;
+	*(BYTE*)0x5E7D63 = 0x5D;
+	*(BYTE*)0x5E7D64 = 0xC2;
+	*(BYTE*)0x5E7D65 = 0x1C;
+	*(BYTE*)0x5E7D66 = 0x00;
+
+	UnFuck(0x6348F6,4);
+	*(DWORD*)0x6348F6 = 0xFFFFFFFF;
+	UnFuck(0x634DE2,4);
+	*(DWORD*)0x634DE2 = 0xFFFFFFFF;
+
+	UnFuck(0x71A220,1024);
+	FUNC_100AA540();
+
+	UnFuck(0x7361B2,4);
+	*(DWORD*)0x7361B2 = (DWORD)&GLOBAL_101166F4;
+	UnFuck(0x7361CB,4);
+	*(DWORD*)0x7361CB = (DWORD)&GLOBAL_101166F0;
+	UnFuck(0x7361E0,4);
+	*(DWORD*)0x7361E0 = (DWORD)&GLOBAL_101166F4;
+	UnFuck(0x7361F5,4);
+	*(DWORD*)0x7361F5 = (DWORD)&GLOBAL_101166F0;
+
+	UnFuck(0x524582,5);
+	memset((PVOID)0x524582,0x90,5);
+
+	UnFuck(0x712025,1);
+	*(BYTE*)0x712025 = 1;
+
+	UnFuck(0x858B90,4);
+
+	UnFuck(0x53BF28,5);
+	memset((PVOID)0x53BF28,0x90,5);
+
+	UnFuck(0x859520,8);
+	UnFuck(0xC17044,8);
+
+	UnFuck(0x4C3A5B,10);
+	memset((PVOID)0x4C3A5B,0x90,10);
+
+	UnFuck(0x47BF54,4);
+	InstallSCMEventsProcessor();
 }
 
 //----------------------------------------------------------

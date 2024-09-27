@@ -23,6 +23,10 @@ public:
 	CNewPlayerTags(IDirect3DDevice9* pDevice);
 	~CNewPlayerTags();
 
+	void SpriteBegin();
+	void SpriteEnd();
+	void FUNC_1006CDA0(D3DXVECTOR3 *pPlayerPos, char *pNameText, DWORD dwColor, float fDistanceFromLocalPlayer, bool bDrawSandGlass, int a7);
+
 	void Begin();
 	void End();
 	void Draw(D3DXVECTOR3* pPlayerPos, float fHealth, float fArmor, float fDistanceFromLocalPlayer);

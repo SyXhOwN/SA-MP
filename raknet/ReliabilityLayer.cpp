@@ -32,10 +32,18 @@
 #include <stdlib.h>
 #endif
 
+#ifdef SAMPSRV
+int GetPlayerTimeout();
+#endif
+
 static const int DEFAULT_HAS_RECEIVED_PACKET_QUEUE_SIZE=512;
 static const float PACKETLOSS_TOLERANCE=.02f; // What percentile packetloss we are willing to accept as background noise.
 static const double MINIMUM_SEND_BPS=14400.0; // Won't go below this send rate
+#ifdef SAMPCLI
+static const double STARTING_SEND_BPS=512000.0; // What send rate to start at.
+#else
 static const double STARTING_SEND_BPS=28800.0; // What send rate to start at.
+#endif
 static const float PING_MULTIPLIER_TO_RESEND=3.0; // So internet ping variation doesn't cause needless resends
 static const RakNetTime MIN_PING_TO_RESEND=30; // So system timer changes and CPU lag don't send needless resends
 static const RakNetTimeNS TIME_TO_NEW_SAMPLE=500000; // How many ns to wait before starting a new sample.  This way buffers have time to overflow or relax at the new send rate, if they are indeed going to overflow.
@@ -85,7 +93,11 @@ ReliabilityLayer::ReliabilityLayer() : updateBitStream( DEFAULT_MTU_SIZE )   // 
 	// Wait longer to disconnect in debug so I don't get disconnected while tracing
 	timeoutTime=30000;
 #else
+#ifdef SAMPSRV
+	timeoutTime=GetPlayerTimeout();
+#else
 	timeoutTime=10000;
+#endif
 #endif
 
 #ifndef _RELEASE
@@ -183,6 +195,13 @@ void ReliabilityLayer::InitializeVariables( void )
 	memset( waitingForSequencedPacketWriteIndex, 0, NUMBER_OF_ORDERED_STREAMS * sizeof(OrderingIndexType) );
 	memset( &statistics, 0, sizeof( statistics ) );
 	statistics.connectionStartTime = RakNet::GetTime();
+	statistics.field_110 = RakNet::GetTime();
+	statistics.field_114 = 0;
+	statistics.field_118 = 0;
+	statistics.field_11C = RakNet::GetTime();
+	statistics.field_120 = 0;
+	statistics.field_124 = 0;
+	reliabilitySizeInBits = 4;
 	splitPacketId = 0;
 	messageNumber = 0;
 	availableBandwidth=0;
@@ -1610,7 +1629,8 @@ int ReliabilityLayer::GetBitStreamHeaderLength( const InternalPacket *const inte
 
 	// Write the PacketReliability.  This is encoded in 3 bits
 	//bitStream->WriteBits((unsigned char*)&(internalPacket->reliability), 3, true);
-	bitLength += 3;
+	//bitLength += 3;
+	bitLength += reliabilitySizeInBits;
 
 	// If the reliability requires an ordering channel and ordering index, we Write those.
 	if ( internalPacket->reliability == UNRELIABLE_SEQUENCED || internalPacket->reliability == RELIABLE_SEQUENCED || internalPacket->reliability == RELIABLE_ORDERED )
@@ -1684,7 +1704,7 @@ int ReliabilityLayer::WriteToBitStreamFromInternalPacket( RakNet::BitStream *bit
 #endif
 
 	// Write the PacketReliability.  This is encoded in 3 bits
-	bitStream->WriteBits( (const unsigned char *)&c, 3, true );
+	bitStream->WriteBits( (const unsigned char *)&c, reliabilitySizeInBits, true );
 
 	// If the reliability requires an ordering channel and ordering index, we Write those.
 	if ( internalPacket->reliability == UNRELIABLE_SEQUENCED || internalPacket->reliability == RELIABLE_SEQUENCED || internalPacket->reliability == RELIABLE_ORDERED )
@@ -1776,7 +1796,7 @@ InternalPacket* ReliabilityLayer::CreateInternalPacketFromBitStream( RakNet::Bit
 	// Read the PacketReliability. This is encoded in 3 bits
 	unsigned char reliability;
 
-	bitStreamSucceeded = bitStream->ReadBits( ( unsigned char* ) ( &( reliability ) ), 3 );
+	bitStreamSucceeded = bitStream->ReadBits( ( unsigned char* ) ( &( reliability ) ), reliabilitySizeInBits );
 
 	internalPacket->reliability = ( const PacketReliability ) reliability;
 
@@ -1785,7 +1805,7 @@ InternalPacket* ReliabilityLayer::CreateInternalPacketFromBitStream( RakNet::Bit
 	// assert( bitStreamSucceeded );
 #endif
 
-	if ( bitStreamSucceeded == false )
+	if ( internalPacket->reliability < UNRELIABLE || bitStreamSucceeded == false )
 	{
 		internalPacketPool.ReleasePointer( internalPacket );
 		return 0;
@@ -2464,7 +2484,7 @@ void ReliabilityLayer::UpdateNextActionTime(void)
 //-------------------------------------------------------------------------------------------------------
 // Statistics
 //-------------------------------------------------------------------------------------------------------
-RakNetStatisticsStruct * const ReliabilityLayer::GetStatistics( void )
+RakNetStatisticsStruct * const ReliabilityLayer::GetStatistics( bool includeResendListDataSize )
 {
 	unsigned i;
 
@@ -2482,7 +2502,11 @@ RakNetStatisticsStruct * const ReliabilityLayer::GetStatistics( void )
 	statistics.bitsPerSecond = currentBandwidth;
 	//statistics.lossySize = lossyWindowSize == MAXIMUM_WINDOW_SIZE + 1 ? 0 : lossyWindowSize;
 //	statistics.lossySize=0;
-	statistics.messagesOnResendQueue = GetResendListDataSize();
+	if (!includeResendListDataSize)
+		statistics.messagesOnResendQueue = GetResendListDataSize();
+	else
+		statistics.messagesOnResendQueue = 0;
+
 
 	return &statistics;
 }

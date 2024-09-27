@@ -27,7 +27,7 @@ void ScrUnk45(RPCParameters *rpcParams)
 
 //----------------------------------------------------
 
-void ScrUnk0B(RPCParameters *rpcParams)
+void ScrSetPlayerName(RPCParameters *rpcParams)
 {
 }
 
@@ -142,13 +142,13 @@ void ScrSetInterior(RPCParameters *rpcParams)
 
 //----------------------------------------------------
 
-void ScrUnk9D(RPCParameters *rpcParams)
+void ScrSetCameraPos(RPCParameters *rpcParams)
 {
 }
 
 //----------------------------------------------------
 
-void ScrUnk9E(RPCParameters *rpcParams)
+void ScrSetCameraLookAt(RPCParameters *rpcParams)
 {
 }
 
@@ -178,7 +178,7 @@ void ScrUnk41(RPCParameters *rpcParams)
 
 //----------------------------------------------------
 
-void ScrUnkA2(RPCParameters *rpcParams)
+void ScrSetCameraBehindPlayer(RPCParameters *rpcParams)
 {
 }
 
@@ -491,7 +491,7 @@ void RegisterScriptRPCs(RakClientInterface* pRakClient)
 	REGISTER_STATIC_RPC(pRakClient, ScrSetSpawnInfo);
 	REGISTER_STATIC_RPC(pRakClient, ScrUnk45);
 	REGISTER_STATIC_RPC(pRakClient, ScrUnk99);
-	REGISTER_STATIC_RPC(pRakClient, ScrUnk0B);
+	REGISTER_STATIC_RPC(pRakClient, ScrSetPlayerName);
 	REGISTER_STATIC_RPC(pRakClient, ScrSetPlayerPos);
 	REGISTER_STATIC_RPC(pRakClient, ScrUnk0D);
 	REGISTER_STATIC_RPC(pRakClient, ScrUnk0E);
@@ -499,13 +499,13 @@ void RegisterScriptRPCs(RakClientInterface* pRakClient)
 	REGISTER_STATIC_RPC(pRakClient, ScrRemovePlayerFromVehicle);
 	REGISTER_STATIC_RPC(pRakClient, ScrSetPlayerColor);
 	REGISTER_STATIC_RPC(pRakClient, ScrDisplayGameText);
-	REGISTER_STATIC_RPC(pRakClient, ScrUnk9D);
-	REGISTER_STATIC_RPC(pRakClient, ScrUnk9E);
 	REGISTER_STATIC_RPC(pRakClient, ScrSetInterior);
+	REGISTER_STATIC_RPC(pRakClient, ScrSetCameraPos);
+	REGISTER_STATIC_RPC(pRakClient, ScrSetCameraLookAt);
 	REGISTER_STATIC_RPC(pRakClient, ScrUnk9F);
 	REGISTER_STATIC_RPC(pRakClient, ScrUnkA0);
 	REGISTER_STATIC_RPC(pRakClient, ScrUnkA1);
-	REGISTER_STATIC_RPC(pRakClient, ScrUnkA2);
+	REGISTER_STATIC_RPC(pRakClient, ScrSetCameraBehindPlayer);
 	REGISTER_STATIC_RPC(pRakClient, ScrUnk0F);
 	REGISTER_STATIC_RPC(pRakClient, ScrUnk10);
 	REGISTER_STATIC_RPC(pRakClient, ScrUnk11);
@@ -564,7 +564,7 @@ void UnRegisterScriptRPCs(RakClientInterface* pRakClient)
 {
 	UNREGISTER_STATIC_RPC(pRakClient, ScrSetSpawnInfo);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrUnk45);
-	UNREGISTER_STATIC_RPC(pRakClient, ScrUnk0B);
+	UNREGISTER_STATIC_RPC(pRakClient, ScrSetPlayerName);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrUnk99);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrSetPlayerPos);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrUnk0D);
@@ -573,13 +573,13 @@ void UnRegisterScriptRPCs(RakClientInterface* pRakClient)
 	UNREGISTER_STATIC_RPC(pRakClient, ScrRemovePlayerFromVehicle);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrSetPlayerColor);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrDisplayGameText);
-	UNREGISTER_STATIC_RPC(pRakClient, ScrUnk9D);
-	UNREGISTER_STATIC_RPC(pRakClient, ScrUnk9E);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrSetInterior);
+	UNREGISTER_STATIC_RPC(pRakClient, ScrSetCameraPos);
+	UNREGISTER_STATIC_RPC(pRakClient, ScrSetCameraLookAt);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrUnk9F);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrUnkA0);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrUnkA1);
-	UNREGISTER_STATIC_RPC(pRakClient, ScrUnkA2);
+	UNREGISTER_STATIC_RPC(pRakClient, ScrSetCameraBehindPlayer);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrUnk0F);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrUnk10);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrUnk11);

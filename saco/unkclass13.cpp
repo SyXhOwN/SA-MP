@@ -42,3 +42,12 @@ void CUnkClass13::RestoreDeviceObjects()
 			desc.Format, TRUE, D3DFMT_D16, &m_pD3DRenderToSurface);
 	}
 }
+
+IDirect3DTexture9* CUnkClass13::FUNC_1006D880(char *szString)
+{
+	//D3DXCreateTexture();
+
+	// TODO: CUnkClass13::FUNC_1006D880 .text:1006D880
+	
+	return NULL;
+}

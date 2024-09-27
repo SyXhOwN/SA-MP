@@ -9,6 +9,14 @@ extern GAME_SETTINGS tSettings;
 
 extern bool bShowDebugLabels;
 
+//////////////////////////////////////////////////////
+//
+// -------R E L E A S E   C O M M A N D S--------
+//
+// (INCLUDES SCRIPTING UTILS)
+//
+//////////////////////////////////////////////////////
+
 void cmdDefaultCmdProc(PCHAR szCmd)
 {
 	if(pNetGame) {
@@ -17,6 +25,8 @@ void cmdDefaultCmdProc(PCHAR szCmd)
 		pLocalPlayer->Say(szCmd);
 	}
 }
+
+//----------------------------------------------------
 
 void cmdTestDeathWindow(PCHAR szCmd)
 {
@@ -31,6 +41,8 @@ void cmdTestDeathWindow(PCHAR szCmd)
 		pDeathWindow->AddMessage("Pooper","PooperPooperPooper0001",0xFFFFFFFF,0xFFFFFFFF,0);
 	}
 }
+
+//----------------------------------------------------
 
 void cmdCameraTargetDebug(PCHAR szCmd)
 {
@@ -49,7 +61,8 @@ void cmdFontSize(PCHAR szCmd)
 
 void cmdNameTagStatus(PCHAR szCmd)
 {
-	// TODO: cmdNameTagStatus .text:10068720
+	if(pNetGame)
+		pNetGame->TogglePlayerTagStatus();
 }
 
 void cmdTimestamp(PCHAR szCmd)
@@ -72,10 +85,14 @@ void cmdHudScaleFix(PCHAR szCmd)
 	// TODO: cmdHudScaleFix .text:10068870
 }
 
+//----------------------------------------------------
+
 void cmdMem(PCHAR szCmd)
 {
 	pChatWindow->AddDebugMessage("Memory: %u",*(DWORD *)0x8A5A80);
 }
+
+//----------------------------------------------------
 
 void cmdSetFrameLimit(PCHAR szCmd)
 {
@@ -142,10 +159,14 @@ void cmdToggleObjectLight(PCHAR szCmd)
 	// TODO: cmdToggleObjectLight .text:10069000
 }
 
+//----------------------------------------------------
+
 void cmdDebugLabels(PCHAR szCmd)
 {
 	bShowDebugLabels = !bShowDebugLabels;
 }
+
+//----------------------------------------------------
 
 void cmdRcon(PCHAR szCmd)
 {
@@ -153,7 +174,7 @@ void cmdRcon(PCHAR szCmd)
 }
 
 //----------------------------------------------------
-
+// MATCH
 void SetupCommands()
 {
 	// RELEASE COMMANDS

@@ -60,6 +60,9 @@ private:
 
 	BOOL LoadSinglePlugin(char *szPluginPath);
 
+	void ConvertFromHex(unsigned char* pbBuffer, char* szData, unsigned int dwMaxLength);
+	bool IsValidForNoSign(char* szFilename);
+
 public:
 	CPlugins();
 	~CPlugins();

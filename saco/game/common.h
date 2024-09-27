@@ -58,6 +58,7 @@ typedef struct _MATRIX4X4 {
 #define IN_VEHICLE(x) ((x->dwStateFlags & 256) >> 8)
 
 //-----------------------------------------------------------
+#pragma pack(1)
 typedef struct _WEAPON_SLOT_TYPE
 {
 	DWORD dwType;
@@ -70,11 +71,24 @@ typedef struct _WEAPON_SLOT_TYPE
 
 } WEAPON_SLOT_TYPE;  // MUST BE EXACTLY ALIGNED TO 28 bytes
 
+//-----------------------------------------------------------
+#pragma pack(1)
 typedef struct _PED_TASKS_TYPE
 {
-	char _gap0[16];
-
+	DWORD * pdwPed;
+	// Basic Tasks
+	DWORD * pdwDamage;
+	DWORD * pdwFallEnterExit;
+	DWORD * pdwSwimWasted;
 	DWORD * pdwJumpJetPack;
+	DWORD * pdwAction;
+	// Extended Tasks
+	DWORD * pdwFighting;
+	DWORD * pdwCrouching;
+	DWORD * pdwSay;
+	DWORD * pdwFacialComplex;
+	DWORD * pdwPartialAnim;
+	DWORD * pdwIK;
 } PED_TASKS_TYPE;
 
 //-----------------------------------------------------------
@@ -88,8 +102,8 @@ typedef struct _ENTITY_TYPE
 
 	MATRIX4X4 *mat; // 20-24
 	DWORD *pdwRenderWare; // 24-28
-
-	char _gap1C[6];
+	DWORD dwProcessingFlags; // 28-32
+	char _gap20[2];
 
 	WORD nModelIndex; // 34-36
 
@@ -117,6 +131,7 @@ typedef struct _PED_TYPE
 
 	PED_TASKS_TYPE *Tasks; // 1148-1152
 	DWORD dwPlayerInfoOffset; // 1152-1156
+
 	char _gap484[124];
 
 	DWORD dwActiveVision; // 1280-1284
@@ -138,7 +153,15 @@ typedef struct _PED_TYPE
 	float fRotation1;	// 1368-1372
 	float fRotation2;	// 1372-1376
 
-	char _gap560[44];
+	char _gap560[8];
+
+	DWORD pContactVehicle; // 1384 - 1388
+
+	char _gap56C[24];
+
+	DWORD pContactEntity; // 1412 - 1416
+
+	char _gap588[4];
 
 	DWORD pVehicle;	// 1420-1424
 
@@ -153,6 +176,10 @@ typedef struct _PED_TYPE
 	char _gap70C[12];
 
 	BYTE byteCurWeaponSlot; // 1816-1817
+
+	char _gap719[20];
+
+	BYTE byteFightingStyle; // 1837-1838
 
 } PED_TYPE;
 
@@ -230,7 +257,12 @@ typedef struct _VEHICLE_TYPE
 		};
 	};
 
-	char _pad5BA[162];
+	char _gap5BA[142];
+
+	float fBikeBankingAngle1; // 1608-1612
+	float fBikeBankingAngle2; // 1612-1616
+
+	char _gap650[12];
 
 	BYTE bBikeWheelPopped[2]; // 1628-1630
 

@@ -6,7 +6,8 @@
 #pragma pack(1)
 class CRemotePlayer
 {
-private:
+//private:
+public:
 	//char _gap0[509];
 	int field_0;
 	int field_4;
@@ -22,7 +23,7 @@ private:
 	char field_8E[31];
 	char field_AD[24];
 	char field_C5[68];
-	char field_109;
+	BYTE field_109;
 	char field_10A;
 	char field_10B;
 	int field_10C;
@@ -41,19 +42,24 @@ private:
 	char field_1C9[12];
 	DWORD field_1D5;
 	DWORD field_1D9;
-	int field_1DD;
+	CPlayerPed			*m_pPlayerPed;
 	int field_1E1;
-	short field_1E5;
+	PLAYERID			m_PlayerID;
 	short field_1E7;
 	int field_1E9;
 	int field_1ED;
 	int field_1F1;
 	int field_1F5;
-	int field_1F9;
+	DWORD m_dwMarkerID; //int field_1F9;
 
 public:
 
 	CRemotePlayer();
+	~CRemotePlayer();
+
+	void SetID(PLAYERID playerId) { m_PlayerID = playerId; };
+	PLAYERID GetID() { return m_PlayerID; };
+	CPlayerPed * GetPlayerPed() { return m_pPlayerPed; };
 
 	void ResetAllSyncAttributes();
 

@@ -4,7 +4,9 @@
 
 #define MAX_SPAWNS 319
 
+#define GAMESTATE_STOPPED	 0
 #define GAMESTATE_RUNNING	 1
+#define GAMESTATE_RESTARTING 2
 
 #define INVALID_ID			0xFFFF
 
@@ -77,29 +79,71 @@ public:
 
 	void Init(BOOL bFirst);
 	void ShutdownForGameModeRestart();
+	void ReInitWhenRestarting();
 	BOOL SetNextScriptFile(char *szFile);
 
+	int GetGameState() { return m_iGameState; };
 
 	CPlayerPool * GetPlayerPool() { return m_pPlayerPool; };
 	CVehiclePool * GetVehiclePool() { return m_pVehiclePool; };
 	RakServerInterface * GetRakServer() { return m_pRak; };
 	CGameMode * GetGameMode() { return m_pGameMode; };
 	CFilterScripts * GetFilterScripts() { return m_pFilterScripts; };
+	CMenuPool * GetMenuPool() { return m_pMenuPool; };
 	CGangZonePool * GetGangZonePool() { return m_pGangZonePool; };
 	CActorPool * GetActorPool() { return m_pActorPool; };
 
+	void SendClientMessageToAll(DWORD dwColor, char* szMessage, ...);
 	void MasterServerAnnounce(float fElapsedTime);
+	void UpdateTickCounter();
 	char *GetNextScriptFile();
 	void LoadAllFilterscripts();
 
 	void Process();
 
+	void BroadcastData( char *szUniqueID,
+						RakNet::BitStream *bitStream,
+						PLAYERID excludedPlayer,
+						char orderingStream );
+
+	void SendToPlayer( char *szUniqueID,
+					   RakNet::BitStream *bitStream,
+					   PLAYERID playerId,
+					   char orderingChannel );
+
+	// Packet Handlers
+	void Packet_AimSync(Packet *p);
+	void Packet_PlayerSync(Packet *p);
+	void Packet_VehicleSync(Packet *p);
+	void Packet_PassengerSync(Packet *p);
+	void Packet_SpectatorSync(Packet *p);
+	void Packet_WeaponShotSync(Packet *p);
+	void Packet_NewIncomingConnection(Packet* packet);
+	void Packet_DisconnectionNotification(Packet* packet);
+	void Packet_ConnectionLost(Packet* packet);
+	void Packet_ModifiedPacket(Packet* packet);
+	void Packet_RemotePortRefused(Packet* packet);
+	void Packet_InGameRcon(Packet* packet);
+	void Packet_StatsUpdate(Packet *p);
+	void Packet_WeaponsUpdate(Packet *p);
+	void Packet_TrailerSync(Packet *p);
+	void Packet_UnoccupiedSync(Packet *p);
+
+	void KickPlayer(PLAYERID kickPlayer);
+	void BlockIpAddress(char *ip_address, int timems);
+	void UnBlockIpAddress(char *ip_address);
+	void AddBan(char * nick, char * ip_mask, char * reason);
+	void RemoveBan(char * ip_mask);
 	void LoadBanList();
 
 	// CLASS SYSTEM
 	int					m_iSpawnsAvailable;
 	PLAYER_SPAWN_INFO	m_AvailableSpawns[MAX_SPAWNS];
+	int AddSpawn(PLAYER_SPAWN_INFO *pSpawnInfo);
 
+	void SetWorldTime(BYTE byteHour);
+	void SetWeather(BYTE byteWeather);
+	void SetGravity(float fGravity);
 	const PCHAR GetWeaponName(int iWeaponID);
 
 	DWORD GetTime();

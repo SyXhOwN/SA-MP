@@ -3,6 +3,9 @@
 
 #define CHECK_PARAMS(n) { if (params[0] != (n * sizeof(cell))) { logprintf("SCRIPT: Bad parameter count (Count is %d, Should be %d): ", params[0] / sizeof(cell), n); return 0; } }
 
+char* format_amxstring(AMX *amx, cell *params, int parm, int &len);
+int set_amxstring(AMX *amx,cell amx_addr,const char *source,int max);
+
 extern CNetGame* pNetGame;
 
 //----------------------------------------------------------------------------------
@@ -93,8 +96,12 @@ static cell AMX_NATIVE_CALL n_atan2(AMX *amx, cell *params)
 // native StartRecordingPlayback(playbacktype, recordname[])
 static cell AMX_NATIVE_CALL n_StartRecordingPlayback(AMX *amx, cell *params)
 {
-	// TODO: n_StartRecordingPlayback
-	return 0;
+	char *szRecordName;
+	amx_StrParam(amx, params[2], szRecordName);
+	if(params[1] == PLAYER_RECORDING_TYPE_DRIVER || params[1] == PLAYER_RECORDING_TYPE_ONFOOT) {
+		pNetGame->StartRecordingPlayback(params[1], szRecordName);
+	}
+	return 1;
 }
 
 // native StopRecordingPlayback()
@@ -260,6 +267,18 @@ static cell AMX_NATIVE_CALL n_GetPlayerKeys(AMX *amx, cell *params)
 	return 0;
 }
 
+// native GetPlayerFacingAngle(playerid,&Float:ang);
+static cell AMX_NATIVE_CALL n_GetPlayerFacingAngle(AMX *amx, cell *params)
+{
+	if(!pNetGame->GetPlayerPool()->GetSlotState((PLAYERID)params[1])) return 0;
+
+	cell* cptr;
+	amx_GetAddr(amx, params[2], &cptr);
+	float fZAngle = pNetGame->GetPlayerFacingAngle((PLAYERID)params[1]);
+	*cptr = amx_ftoc(fZAngle);
+
+	return 1;
+}
 
 // native GetMyPos(&Float:x, &Float:y, &Float:z)
 static cell AMX_NATIVE_CALL n_GetMyPos(AMX *amx, cell *params)

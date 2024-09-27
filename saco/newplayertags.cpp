@@ -1,6 +1,9 @@
 
 #include "main.h"
 
+extern CFontRender *pDefaultFont;
+extern CDeathWindow *pDeathWindow;
+
 HealthBarVertices1_s HealthBarBDRVertices1[4] =
 {	//x      y      z     rhw   c
 	{0.0f,   0.0f,  0.0f, 1.0f, D3DCOLOR_XRGB(0, 0, 0)},
@@ -76,6 +79,18 @@ void CNewPlayerTags::End()
 		m_pStates->Apply();
 }
 
+void CNewPlayerTags::SpriteBegin()
+{
+	if(m_pSprite)
+		m_pSprite->Begin(D3DXSPRITE_ALPHABLEND);
+}
+
+void CNewPlayerTags::SpriteEnd()
+{
+	if(m_pSprite)
+		m_pSprite->End();
+}
+
 void CNewPlayerTags::DeleteDeviceObjects()
 {
 	SAFE_RELEASE(m_pStates);
@@ -91,6 +106,73 @@ void CNewPlayerTags::RestoreDeviceObjects()
 
 	if(!m_pStates)
 		m_pDevice->CreateStateBlock(D3DSBT_ALL, &m_pStates);
+}
+
+void CNewPlayerTags::FUNC_1006CDA0(D3DXVECTOR3 *pPlayerPos, char *pNameText, DWORD dwColor, float fDistanceFromLocalPlayer, bool bDrawSandGlass, int a7)
+{
+	// TODO: CNewPlayerTags::FUNC_1006CDA0
+
+	/*RECT rect, rectBack;
+	D3DXVECTOR3 TagPos;
+	D3DVIEWPORT9 Viewport;
+	D3DXVECTOR3 Out;
+	D3DXMATRIX matIdent;
+
+	TagPos = *pPlayerPos;
+	TagPos.z += 0.2f + (fDistanceFromLocalPlayer * 0.0475f);
+
+	this->m_pDevice->GetViewport(&Viewport);
+
+	D3DXMatrixIdentity(&matIdent);
+	D3DXVec3Project(&Out, &TagPos, &Viewport, &matProj, &matView, &matIdent);
+
+	if (Out.z > 1.0f)
+		return;
+
+	rect.left = rect.right = (int)Out.x;
+	rect.top = rect.bottom = (int)Out.y;
+	SIZE size = pDefaultFont->MeasureText(pNameText);
+	rect.left -= size.cx/2;
+	rect.top -= size.cy - 17;
+	rect.right += size.cx/2;
+
+	pDefaultFont->RenderText(this->m_pSprite,pNameText,rect,DT_NOCLIP|DT_LEFT,dwColor);
+
+	rect.left += size.cx/2;
+	rect.top -= size.cy;
+	rect.right -= size.cx/2;
+
+	if(!bDrawSandGlass || !pDeathWindow)
+		return;
+
+	if(!pDeathWindow->field_14B)
+		pDeathWindow->CreateAuxFonts();
+
+	ID3DXFont* v12 = pDeathWindow->field_14F;
+	ID3DXFont* v13 = pDeathWindow->field_153;
+	if(!v12 || !v13)
+		return;
+
+	rectBack.left = 0;
+	rectBack.top = 0;
+	rectBack.right = 0;
+	rectBack.bottom = 0;
+
+	// Get the rect of the rounded square symbol character
+	v13->DrawText(0,"C",1,&rectBack,DT_CENTER|DT_VCENTER|DT_NOCLIP|DT_CALCRECT,0x00000000);
+
+	rect.top += (rectBack.bottom - rectBack.top) / 2 + 17;
+	rect.bottom = rect.top + 2;
+	rect.left -= ((rectBack.right - rectBack.left) / 2) + 22;
+	rect.right = rect.left + 1;
+
+	if ( a7 == 2 ) {
+		v13->DrawText(0,"C",1,&rect,DT_CENTER|DT_VCENTER|DT_NOCLIP,0xFF000000);
+		rect.top -= 2;
+		rect.left -= 1;
+
+		v12->DrawText(0,"E",1,&rect,DT_CENTER|DT_VCENTER|DT_NOCLIP,0xFFE3E1E3);
+	}*/
 }
 
 void CNewPlayerTags::Draw(D3DXVECTOR3* pPlayerPos, float fHealth, float fArmor, float fDistanceFromLocalPlayer)

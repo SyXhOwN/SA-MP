@@ -7,11 +7,15 @@
 
 #define SAFE_DELETE(p)	{ if (p) { delete (p); (p) = NULL; } }
 
+#define IDC_CMDEDIT		1
+
+#define MAX_PLAYER_NAME			24
 #define MAX_SETTINGS_STRING		256
 
 #define GTASA_VERSION_UNKNOWN	0
 #define GTASA_VERSION_USA10		1
 #define GTASA_VERSION_EU10		2
+#define CSCANNER_DISTANCE		200.0f
 
 typedef struct _GAME_SETTINGS {
 	BOOL bDebug;
@@ -29,16 +33,19 @@ typedef struct _GAME_SETTINGS {
 
 #include "d3d9/include/d3d9.h"
 #include "d3d9/include/d3dx9core.h"
+#include "d3d9/common/dxstdafx.h"
 #include "game/game.h"
 
 #include "../raknet/RakClientInterface.h"
 #include "../raknet/RakNetworkFactory.h"
+#include "../raknet/BitStream.h"
 #include "../raknet/PacketEnumerations.h"
 #include "../raknet/SAMPRPC.h"
 #include "../raknet/GetTime.h"
 
 #include "net/localplayer.h"
 #include "net/remoteplayer.h"
+#include "net/netplayer.h"
 #include "net/netrpc.h"
 #include "net/actorpool.h"
 #include "net/playerpool.h"

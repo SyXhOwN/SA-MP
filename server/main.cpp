@@ -17,9 +17,9 @@ int iMinConnectionTime;
 int iDbLogging;
 int iDbLogQueries;
 
-int unnamed_3; // W: 004F5FEC L: 081AA8A4
-int unnamed_4; // W: 004F5FF0 L: 081AA8A0
 unsigned int _uiRndSrvChallenge;
+int unnamed_3; // TODO: rename W: 004F5FEC L: 081AA8A4
+int unnamed_4; // TODO: rename W: 004F5FF0 L: 081AA8A0
 
 int iOnFootRate = 30;
 int iInCarRate = 30;
@@ -429,8 +429,8 @@ int main (int argc, char** argv)
 		}
 
 		#ifdef WIN32
-			SetEvent(hConsoleExecuteEvent);
-			WaitForSingleObject(hConsoleExecuteEvent, INFINITE);
+		SetEvent(hConsoleExecuteEvent);
+		WaitForSingleObject(hConsoleExecuteEvent, INFINITE);
 		#endif
 
 		if(RakNet::GetTime() - unnamed_4 > iConnSeedTime)

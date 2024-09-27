@@ -1,23 +1,34 @@
 
 #pragma once
 
-class CAudioStream // size=1
+#include "bass.h"
+
+//----------------------------------------------------
+
+class CAudioStream
 {
 private:
-	char field_0;
+	bool field_0;
 
 public:
-
 	CAudioStream() {
 		field_0 = 0;
 	}
 
-	void Reset();
-	void Stop();
-	void ConstructInfo();
-	void SyncProc();
-	void Process();
-	void Play();
-	void ControlGameRadio();
-	void DrawInfo();
+	BOOL Initialize();
+	BOOL Stop(bool bWaitForThread=true);
+	BOOL Play(char *szURL, float fX, float fY, float fZ, float fDistance, bool bUsePos);
+	void HandleGameAudio();
+	void Draw();
+
+	void Test3D();
+
+	static void DoMeta();
+	static void CALLBACK MetaSync(HSYNC handle, DWORD channel, DWORD data, void *user);
+	static void ProcessThread(PVOID v);
+
+	// Delete this:
+	void Process() {}
 };
+
+//----------------------------------------------------

@@ -12,7 +12,7 @@ extern CNetGame	*pNetGame;
 extern CChatWindow *pChatWindow;
 
 //-----------------------------------------------------------
-
+// MATCH
 void CEntity::GetMatrix(PMATRIX4X4 Matrix)
 {
 	if (!m_pEntity || !m_pEntity->mat) return;
@@ -35,7 +35,7 @@ void CEntity::GetMatrix(PMATRIX4X4 Matrix)
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 void CEntity::SetMatrix(MATRIX4X4 Matrix)
 {
 	if (!m_pEntity || !m_pEntity->mat) return;
@@ -59,32 +59,36 @@ void CEntity::SetMatrix(MATRIX4X4 Matrix)
 
 //-----------------------------------------------------------
 
-void CEntity::FUNC_1009EC80()
+void CEntity::UpdateRwMatrixAndFrame()
 {
-	if(!m_pEntity || m_pEntity->vtable == 0x863C40) return;
+	if(!m_pEntity) return;
+	if(m_pEntity->vtable == 0x863C40) return;
+
+	if(!m_pEntity) return;
 
 	DWORD dwRenderWare = (DWORD)m_pEntity->pdwRenderWare;
 	DWORD dwMatrix = (DWORD)m_pEntity->mat;
 	DWORD dwEntity = (DWORD)m_pEntity;
 
-	if(dwEntity && dwRenderWare && dwMatrix)
-	{
-		_asm mov edx, dwRenderWare
-		_asm mov eax, [edx+4]
-		_asm add eax, 16
-		_asm push eax
-		_asm mov ecx, dwMatrix
-		_asm mov edx, 0x59AD70
-		_asm call edx
+	if(!m_pEntity) return;
+	if(!m_pEntity->pdwRenderWare) return;
+	if(!m_pEntity->mat) return;
 
-		_asm mov ecx, dwEntity
-		_asm mov edx, 0x532B00
-		_asm call edx
-	}
+	_asm mov edx, dwRenderWare
+	_asm mov eax, [edx+4]
+	_asm add eax, 16
+	_asm push eax
+	_asm mov ecx, dwMatrix
+	_asm mov edx, 0x59AD70 ; CMatrix__UpdateRwMatrix
+	_asm call edx
+
+	_asm mov ecx, dwEntity
+	_asm mov edx, 0x532B00 ; CEntity__UpdateRwFrame
+	_asm call edx
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 void CEntity::GetMoveSpeedVector(PVECTOR Vector)
 {
 	Vector->X = m_pEntity->vecMoveSpeed.X;
@@ -93,7 +97,7 @@ void CEntity::GetMoveSpeedVector(PVECTOR Vector)
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 void CEntity::SetMoveSpeedVector(VECTOR Vector)
 {
 	m_pEntity->vecMoveSpeed.X = Vector.X;
@@ -117,16 +121,58 @@ void CEntity::FUNC_1009ED40(float fX, float fY, float fZ)
 	field_4[4].Y = fY;
 	field_4[4].Z = fZ;
 
-	m_pEntity->vecMoveSpeed.X =
-		(field_4[0].X + field_4[1].X + field_4[2].X + field_4[3].X + field_4[4].X) * 0.2f;
-	m_pEntity->vecMoveSpeed.Y =
-		(field_4[0].Y + field_4[1].Y + field_4[2].Y + field_4[3].Y + field_4[4].Y) * 0.2f;
-	m_pEntity->vecMoveSpeed.Z =
-		(field_4[0].Z + field_4[1].Z + field_4[2].Z + field_4[3].Z + field_4[4].Z) * 0.2f;
+	fX = field_4[0].X;
+	fY = field_4[0].Y;
+	fZ = field_4[0].Z;
+
+	fX += field_4[1].X;
+	fY += field_4[1].Y;
+	fZ += field_4[1].Z;
+
+	fX += field_4[2].X;
+	fY += field_4[2].Y;
+	fZ += field_4[2].Z;
+
+	fX += field_4[3].X;
+	fY += field_4[3].Y;
+	fZ += field_4[3].Z;
+
+	fX += field_4[4].X;
+	fY += field_4[4].Y;
+	fZ += field_4[4].Z;
+
+	fX *= 0.2f;
+	fY *= 0.2f;
+	fZ *= 0.2f;
+
+	m_pEntity->vecMoveSpeed.X = fX;
+	m_pEntity->vecMoveSpeed.Y = fY;
+	m_pEntity->vecMoveSpeed.Z = fZ;
+
+	/*fX = field_4[0].X;
+	fY = field_4[0].Y;
+	fZ = field_4[0].Z;
+
+	fX += field_4[1].X;
+	fY += field_4[1].Y;
+	fZ += field_4[1].Z;
+
+	fX += field_4[2].X;
+	fY += field_4[2].Y;
+	fZ += field_4[2].Z;
+
+	float fRX = (field_4[0].X + field_4[1].X + field_4[2].X + field_4[3].X + field_4[4].X) * 0.2f;
+	float fRY = (field_4[0].Y + field_4[1].Y + field_4[2].Y + field_4[3].Y + field_4[4].Y) * 0.2f;
+	float fRZ = (field_4[0].Z + field_4[1].Z + field_4[2].Z + field_4[3].Z + field_4[4].Z) * 0.2f;
+
+	m_pEntity->vecMoveSpeed.X = fX;
+	m_pEntity->vecMoveSpeed.Y = fY;
+	m_pEntity->vecMoveSpeed.Z = fZ;
+	*/	
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 void CEntity::GetTurnSpeedVector(PVECTOR Vector)
 {
 	Vector->X = m_pEntity->vecTurnSpeed.X;
@@ -135,7 +181,7 @@ void CEntity::GetTurnSpeedVector(PVECTOR Vector)
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 void CEntity::SetTurnSpeedVector(VECTOR Vector)
 {
 	m_pEntity->vecTurnSpeed.X = Vector.X;
@@ -144,7 +190,7 @@ void CEntity::SetTurnSpeedVector(VECTOR Vector)
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 void CEntity::ApplyTurnSpeed()
 {
 	DWORD dwEnt = (DWORD)m_pEntity;
@@ -156,7 +202,7 @@ void CEntity::ApplyTurnSpeed()
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 float CEntity::GetDistanceFromCentreOfMassToBaseOfModel()
 {
 	DWORD dwEnt = (DWORD)m_pEntity;
@@ -173,7 +219,7 @@ float CEntity::GetDistanceFromCentreOfMassToBaseOfModel()
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 void CEntity::GetBoundCentre(PVECTOR Vector)
 {
 	DWORD dwEnt = (DWORD)m_pEntity;
@@ -186,7 +232,7 @@ void CEntity::GetBoundCentre(PVECTOR Vector)
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 void CEntity::GetBoundRect(PFRECT Rect)
 {
 	DWORD dwEnt = (DWORD)m_pEntity;
@@ -199,14 +245,57 @@ void CEntity::GetBoundRect(PFRECT Rect)
 }
 
 //-----------------------------------------------------------
+// MATCH
+BOOL CEntity::SetModelIndex(UINT uiModel)
+{
+	if(!m_pEntity) return FALSE;
 
+	BOOL bResult=FALSE;
+	int iCounter=0;
+
+	if(!pGame->IsModelLoaded(uiModel) && !GetModelRwObject(uiModel)) {
+		pGame->RequestModel(uiModel);
+		pGame->LoadRequestedModels();
+		while(!pGame->IsModelLoaded(uiModel)) {
+			Sleep(1);
+			iCounter++;
+			if(iCounter>200) {
+				if(pChatWindow)
+					pChatWindow->AddDebugMessage("Warning: Model %u wouldn't load in time!", uiModel);
+				return FALSE;
+			}
+		}
+		bResult = TRUE;
+	}
+
+	DWORD dwThisEntity = (DWORD)m_pEntity;
+
+	_asm {
+		mov		esi, dwThisEntity
+		mov		edi, uiModel
+		mov     edx, [esi]
+		mov     ecx, esi
+		call    dword ptr [edx+32] ; destroy RW
+		mov     eax, [esi]
+		mov		edx, edi
+		push    edi
+		mov     ecx, esi
+		mov     word ptr [esi+34], dx
+		call    dword ptr [eax+20] ; SetModelIndex
+	}
+
+	return bResult;
+}
+
+//-----------------------------------------------------------
+// MATCH
 UINT CEntity::GetModelIndex()
 {
 	return m_pEntity->nModelIndex;
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 void CEntity::TeleportTo(float x, float y, float z)
 {
 	DWORD dwThisEntity = (DWORD)m_pEntity;
@@ -229,7 +318,7 @@ void CEntity::TeleportTo(float x, float y, float z)
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 float CEntity::GetDistanceFromLocalPlayerPed()
 {
 	MATRIX4X4	matFromPlayer;
@@ -262,7 +351,7 @@ float CEntity::GetDistanceFromLocalPlayerPed()
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 float CEntity::GetDistanceFromCamera()
 {
 	if(!m_pEntity || m_pEntity->vtable == 0x863C40) return 100000.0f;
@@ -279,7 +368,7 @@ float CEntity::GetDistanceFromCamera()
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 float CEntity::Get2DDistanceFromLocalPlayerPed()
 {
 	MATRIX4X4	matFromPlayer;
@@ -311,7 +400,7 @@ float CEntity::Get2DDistanceFromLocalPlayerPed()
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 float CEntity::GetDistanceFromPoint(float X, float Y, float Z)
 {
 	MATRIX4X4	matThis;
@@ -326,7 +415,7 @@ float CEntity::GetDistanceFromPoint(float X, float Y, float Z)
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 void CEntity::Add()
 {
 	// Check for CPlaceable messup
@@ -362,7 +451,7 @@ void CEntity::Add()
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 BOOL CEntity::IsAdded()
 {
 	// Check for CPlaceable messup
@@ -377,7 +466,7 @@ BOOL CEntity::IsAdded()
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 void CEntity::Remove()
 {
 	// Check for CPlaceable messup
@@ -402,7 +491,7 @@ void CEntity::Remove()
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 BOOL CEntity::EnforceWorldBoundries(float fPX, float fZX, float fPY, float fNY)
 {
 	MATRIX4X4 matWorld;
@@ -464,7 +553,7 @@ BOOL CEntity::EnforceWorldBoundries(float fPX, float fZX, float fPY, float fNY)
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 BOOL CEntity::HasExceededWorldBoundries(float fPX, float fZX, float fPY, float fNY)
 {
 	MATRIX4X4 matWorld;
@@ -489,7 +578,7 @@ BOOL CEntity::HasExceededWorldBoundries(float fPX, float fZX, float fPY, float f
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 void CEntity::SetCollisionChecking(int iCheck)
 {
 	if(!m_pEntity) return;
@@ -503,7 +592,7 @@ void CEntity::SetCollisionChecking(int iCheck)
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 BOOL CEntity::IsCollisionCheckingEnabled()
 {
 	if(m_pEntity && m_pEntity->vtable != 0x863C40)
@@ -514,7 +603,7 @@ BOOL CEntity::IsCollisionCheckingEnabled()
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 void CEntity::SetGravityProcessing(int iState)
 {
 	if(!m_pEntity) return;
@@ -528,7 +617,7 @@ void CEntity::SetGravityProcessing(int iState)
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 void CEntity::SetWaitingForCollision(int iState)
 {
 	if(!m_pEntity) return;
@@ -543,7 +632,7 @@ void CEntity::SetWaitingForCollision(int iState)
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 void CEntity::DisableStreaming()
 {
 	if(!m_pEntity) return;
@@ -553,7 +642,7 @@ void CEntity::DisableStreaming()
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 void CEntity::EnableTunnelTransition()
 {
 	if(!m_pEntity) return;
@@ -563,7 +652,7 @@ void CEntity::EnableTunnelTransition()
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 void CEntity::SetApplySpeed(int iState)
 {
 	if(!m_pEntity) return;
@@ -592,7 +681,7 @@ void CEntity::SetApplySpeed(int iState)
 
 
 //-----------------------------------------------------------
-
+// MATCH
 BOOL CEntity::IsStationary()
 {
 	if (!IsAdded()) return FALSE; // movespeed vectors are invalid if its not added

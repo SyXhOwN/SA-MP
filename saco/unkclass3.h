@@ -24,5 +24,7 @@ private:
 public:
 	CUnkClass3(IDirect3DDevice9 *pD3DDevice);
 
+	int MsgProc(UINT uMsg, DWORD wParam, DWORD lParam);
+	bool FUNC_1006F4F0();
 	void ResetDialogControls(CDXUTDialog *pDialog);
 };

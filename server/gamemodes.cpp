@@ -138,6 +138,9 @@ void CGameMode::Frame(float fElapsedTime)
 	if (!m_bInitialised)
 		return;
 
+	//if (m_pScriptTimers)
+		//m_pScriptTimers->Process((DWORD)(fElapsedTime * 1000.0f));
+
 	if (!m_bSleeping)
 		return;
 

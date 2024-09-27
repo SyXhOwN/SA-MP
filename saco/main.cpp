@@ -27,6 +27,10 @@ CUnkClass14				*pUnkClass14=0;
 CUnkClass15				*pUnkClass15=0;
 
 BOOL					bGameInited=FALSE;
+BOOL					bNetworkInited=FALSE;
+
+BOOL					bQuitGame=FALSE;
+DWORD					dwStartQuitTick=0;
 
 WORD					wVehicleComponentDebug=0;
 
@@ -55,6 +59,20 @@ DWORD					dwGraphicsLoop=0;
 
 CFileSystem *pFileSystem=NULL;
 
+
+
+
+
+CDXUTDialogResourceManager	*pDialogResourceManager=NULL;
+CDXUTDialog					*pGameUI=NULL;
+CDXUTDialog					*pDXUTDialog1=NULL;
+CDXUTDialog					*pDXUTDialog2=NULL;
+CDXUTDialog					*pDXUTDialog3=NULL;
+CDXUTDialog					*pDXUTDialog4=NULL;
+CDXUTDialog					*pDXUTDialog5=NULL;
+
+IDirect3DSurface9			*pD3DMouseSurface=NULL;
+
 // forwards
 
 BOOL SubclassGameWindow();
@@ -62,6 +80,9 @@ void SetupCommands();
 void TheGraphicsLoop();
 LONG WINAPI exc_handler(_EXCEPTION_POINTERS* exc_inf);
 void FUNC_1009DD50();
+
+void SetupDialogResourceManager();
+void SetupGameUI();
 
 DWORD dwOrgRwSetState=0;
 DWORD dwSetStateCaller=0;
@@ -93,7 +114,7 @@ void LaunchMonitor(PVOID v)
 
 #define ARCHIVE_FILE	"samp.saa"
 
-BOOL WINAPI DllMain_2(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
 	if(DLL_PROCESS_ATTACH==fdwReason)
 	{
@@ -134,13 +155,6 @@ BOOL WINAPI DllMain_2(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 	}
 
 	return TRUE;
-}
-
-//----------------------------------------------------
-
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
-{
-	_asm jmp DllMain_2
 }
 
 //----------------------------------------------------
@@ -351,49 +365,24 @@ void DoInitStuff()
 		pChatWindow = new CChatWindow(pD3DDevice,pDefaultFont,szChatLogFile);
 		pCmdWindow = new CCmdWindow(pD3DDevice);
 
-		if(tSettings.bPlayOnline) {
-			pDeathWindow = new CDeathWindow(pD3DDevice);
-			pSpawnScreen = new CSpawnScreen(pD3DDevice);
-			pNewPlayerTags = new CNewPlayerTags(pD3DDevice);
-			pScoreBoard = new CScoreBoard(pD3DDevice);
-			pUnkClass3 = new CUnkClass3(pD3DDevice);
-			pUnkClass4 = new CUnkClass4(pD3DDevice);
-			pUnkClass5 = new CUnkClass5(pD3DDevice);
-			pNetStats = new CNetStats(pD3DDevice);
-			pSvrNetStats = new CSvrNetStats(pD3DDevice);
-			pHelpDialog = new CHelpDialog(pD3DDevice);
-			pUnkClass8 = new CUnkClass8();
-		}
 
-		pLabel = new CLabel(pD3DDevice);
-		pUnkClass10 = new CUnkClass10(pD3DDevice);
-		pUnkClass11 = new CUnkClass11();
-		pUnkClass12 = new CUnkClass12();
-		pUnkClass13 = new CUnkClass13(pD3DDevice);
-		pUnkClass14 = new CUnkClass14(pD3DDevice);
-		pUnkClass15 = new CUnkClass15();
 
-		// Setting up the commands.
-		OutputDebugString("Setting up commands..");
-		SetupCommands();
-
-		OutputDebugString("Hooking RwSetState..");
-		HookRwRenderStateSet();
-
-		pGame->SetMaxStats();
-
-		if(tSettings.bDebug) {
-		}
-
-		// TODO: DoInitStuff
+		// TODO: DoInitStuff()
 
 		bGameInited = TRUE;
 
 		return;
 	}
 
-	
-	
+	// NET GAME INIT
+	if(!bNetworkInited && tSettings.bPlayOnline) {
+
+		pNetGame = new CNetGame(tSettings.szConnectHost,atoi(tSettings.szConnectPort),
+				tSettings.szNickName,tSettings.szConnectPass);
+
+		bNetworkInited = TRUE;
+		return;
+	}
 }
 
 //----------------------------------------------------
@@ -424,6 +413,17 @@ void TheGraphicsLoop()
 	DoProcessStuff();
 
 	_asm popad
+}
+
+//----------------------------------------------------
+
+void QuitGame()
+{
+	if(pNetGame && pNetGame->GetGameState() == GAMESTATE_CONNECTED) {
+		pNetGame->GetRakClient()->Disconnect(500);
+	}
+	bQuitGame = TRUE;
+	dwStartQuitTick = GetTickCount();
 }
 
 //----------------------------------------------------
@@ -509,6 +509,18 @@ void SetStringFromQuotedCommandLine(char *szCmdLine, char *szString)
 		szString++; szCmdLine++;
 	}
 	*szString = '\0';
+}
+
+//----------------------------------------------------
+
+void d3d9DestroyDeviceObjects()
+{
+	// TOOD: d3d9DestroyDeviceObjects
+}
+
+void d3d9RestoreDeviceObjects()
+{
+	// TODO: d3d9RestoreDeviceObjects
 }
 
 //----------------------------------------------------
@@ -653,5 +665,132 @@ char *GetFontFace()
 		return pConfig->GetStringVariable("fontface");
 	}
 	return "Arial";
+}
+
+void SetupDialogResourceManager()
+{
+	pDialogResourceManager = new CDXUTDialogResourceManager();
+	pDialogResourceManager->OnCreateDevice(pD3DDevice);
+	pDialogResourceManager->OnResetDevice();
+}
+
+void CALLBACK OnDialogEvent3( UINT nEvent, int nControlID, CDXUTControl* pControl, void* pUserContext )
+{
+	// TODO: OnDialogEvent3
+}
+
+void CALLBACK OnGUIEvent( UINT nEvent, int nControlID, CDXUTControl* pControl, void* pUserContext )
+{
+	// TODO: OnGUIEvent
+}
+
+void CALLBACK OnDialogEvent1( UINT nEvent, int nControlID, CDXUTControl* pControl, void* pUserContext )
+{
+	// TODO: OnDialogEvent1
+}
+
+void CALLBACK OnDialogEvent2( UINT nEvent, int nControlID, CDXUTControl* pControl, void* pUserContext )
+{
+	// TODO: OnDialogEvent2
+}
+
+void CALLBACK OnDialogEvent4( UINT nEvent, int nControlID, CDXUTControl* pControl, void* pUserContext )
+{
+	// nothing
+}
+
+void CALLBACK OnDialogEvent5( UINT nEvent, int nControlID, CDXUTControl* pControl, void* pUserContext )
+{
+	// nothing
+}
+
+void SetupGameUI()
+{
+	SAFE_DELETE(pDXUTDialog1);
+	SAFE_DELETE(pGameUI);
+	SAFE_RELEASE(pD3DMouseSurface);
+	SAFE_DELETE(pDXUTDialog2);
+	SAFE_DELETE(pDXUTDialog3);
+	SAFE_DELETE(pDXUTDialog4);
+	SAFE_DELETE(pDXUTDialog5);
+
+	pDXUTDialog1 = new CDXUTDialog();
+	pDXUTDialog1->Init(pDialogResourceManager);
+	pDXUTDialog1->SetCallback( OnDialogEvent1 );
+	pDXUTDialog1->SetSize(640,480);
+	pDXUTDialog1->SetLocation(0,0);
+	pDXUTDialog1->SetBackgroundColors(D3DCOLOR_ARGB( 150, 10, 10, 10 ));
+	pDXUTDialog1->EnableMouseInput(true);
+	pDXUTDialog1->EnableKeyboardInput(true);
+	pDXUTDialog1->SetVisible(false);
+	if(pScoreBoard) pScoreBoard->ResetDialogControls(pDXUTDialog1);
+
+	pGameUI = new CDXUTDialog();
+	pGameUI->Init(pDialogResourceManager);
+	pGameUI->SetCallback( OnGUIEvent );
+	pGameUI->SetLocation(0,0);
+	pGameUI->SetSize(pGame->GetScreenWidth(),pGame->GetScreenHeight());
+	pGameUI->EnableMouseInput(true);
+	pGameUI->EnableKeyboardInput(true);
+	
+	pDXUTDialog2 = new CDXUTDialog();
+	pDXUTDialog2->Init(pDialogResourceManager);
+	pDXUTDialog2->SetCallback( OnDialogEvent2 );
+	pDXUTDialog2->SetLocation(0,0);
+	pDXUTDialog2->SetSize(310,40);
+	pDXUTDialog2->SetBackgroundColors(D3DCOLOR_ARGB( 150, 10, 10, 10 ));
+	pDXUTDialog2->EnableMouseInput(true);
+	pDXUTDialog2->EnableKeyboardInput(false);
+	pDXUTDialog2->SetVisible(false);
+	pDXUTDialog2->AddButton(6, "<<", 10, 5, 90, 30);
+	pDXUTDialog2->AddButton(5, ">>", 110, 5, 90, 30);
+	pDXUTDialog2->AddButton(4, "Spawn", 210, 5, 90, 30);
+	if(pChatWindow) pChatWindow->ResetDialogControls(pGameUI);
+	if(pCmdWindow) pCmdWindow->ResetDialogControls(pGameUI);
+
+	pDXUTDialog3 = new CDXUTDialog();
+	pDXUTDialog3->Init(pDialogResourceManager);
+	pDXUTDialog3->SetCallback(OnDialogEvent3);
+	pDXUTDialog3->SetLocation(0,0);
+	pDXUTDialog3->SetSize(600,300);
+	pDXUTDialog3->EnableMouseInput(true);
+	pDXUTDialog3->EnableKeyboardInput(true);
+	pDXUTDialog3->SetBackgroundColors(D3DCOLOR_ARGB( 220, 5, 5, 5 ));
+	pDXUTDialog3->SetVisible(false);
+	if(pUnkClass3) pUnkClass3->ResetDialogControls(pDXUTDialog3);
+
+	pDXUTDialog4 = new CDXUTDialog();
+	pDXUTDialog4->Init(pDialogResourceManager);
+	pDXUTDialog4->SetCallback(OnDialogEvent4);
+	pDXUTDialog4->SetLocation(0,0);
+	pDXUTDialog4->SetSize(500,160);
+	pDXUTDialog4->EnableMouseInput(true);
+	pDXUTDialog4->EnableKeyboardInput(true);
+	pDXUTDialog4->SetBackgroundColors(D3DCOLOR_ARGB( 220, 5, 5, 5 ));
+	pDXUTDialog4->SetVisible(false);
+	if(pUnkClass4) pUnkClass4->ResetDialogControls(pDXUTDialog4);
+
+	pDXUTDialog5 = new CDXUTDialog();
+	pDXUTDialog5->Init(pDialogResourceManager);
+	pDXUTDialog5->SetCallback(OnDialogEvent5);
+	pDXUTDialog5->SetLocation(0,0);
+	pDXUTDialog5->SetSize(500,160);
+	pDXUTDialog5->EnableMouseInput(true);
+	pDXUTDialog5->EnableKeyboardInput(false);
+	pDXUTDialog5->SetBackgroundColors(D3DCOLOR_ARGB( 220, 5, 5, 5 ));
+	pDXUTDialog5->SetVisible(false);
+	if(pUnkClass5) pUnkClass5->ResetDialogControls(pDXUTDialog5);
+
+	if(!pD3DMouseSurface)
+	{
+		pD3DDevice->CreateOffscreenPlainSurface(32,32,D3DFMT_A8R8G8B8,
+			D3DPOOL_SYSTEMMEM,&pD3DMouseSurface,NULL);
+
+		D3DXLoadSurfaceFromFile(pD3DMouseSurface,NULL,NULL,
+			"mouse.png",NULL,D3DX_FILTER_NONE,0,NULL);
+
+		if(pD3DMouseSurface)
+			pD3DDevice->SetCursorProperties(0,0,pD3DMouseSurface);
+	}
 }
 

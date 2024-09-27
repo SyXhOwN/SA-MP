@@ -23,20 +23,27 @@
 #include "Export.h"
 #include "NetworkTypes.h"
 
-/// \brief Network Statisics Usage 
+typedef unsigned long long uint64_t;
+
+/// \brief Network Statisics Usage
 ///
-/// Store Statistics information related to network usage 
+/// Store Statistics information related to network usage
 struct RAK_DLL_EXPORT RakNetStatisticsStruct
 {
+	// TODO: RakNetStatisticsStruct
+
 	///  Number of Messages in the send Buffer (high, medium, low priority)
 	unsigned messageSendBuffer[ NUMBER_OF_PRIORITIES ];
 	///  Number of messages sent (high, medium, low priority)
 	unsigned messagesSent[ NUMBER_OF_PRIORITIES ];
+
+	char _gap20[16];
+
 	///  Number of data bits used for user messages
-	unsigned messageDataBitsSent[ NUMBER_OF_PRIORITIES ];
+	uint64_t messageDataBitsSent[ NUMBER_OF_PRIORITIES ];
 	///  Number of total bits used for user messages, including headers
-	unsigned messageTotalBitsSent[ NUMBER_OF_PRIORITIES ];
-	
+	uint64_t messageTotalBitsSent[ NUMBER_OF_PRIORITIES ];
+
 	///  Number of packets sent containing only acknowledgements
 	unsigned packetsContainingOnlyAcknowlegements;
 	///  Number of acknowledgements sent
@@ -44,53 +51,53 @@ struct RAK_DLL_EXPORT RakNetStatisticsStruct
 	///  Number of acknowledgements waiting to be sent
 	unsigned acknowlegementsPending;
 	///  Number of acknowledgements bits sent
-	unsigned acknowlegementBitsSent;
-	
+	uint64_t acknowlegementBitsSent;
+
 	///  Number of packets containing only acknowledgements and resends
 	unsigned packetsContainingOnlyAcknowlegementsAndResends;
-	
+
 	///  Number of messages resent
 	unsigned messageResends;
 	///  Number of bits resent of actual data
-	unsigned messageDataBitsResent;
+	uint64_t messageDataBitsResent;
 	///  Total number of bits resent, including headers
-	unsigned messagesTotalBitsResent;
+	uint64_t messagesTotalBitsResent;
 	///  Number of messages waiting for ack (// TODO - rename this)
 	unsigned messagesOnResendQueue;
-	
+
 	///  Number of messages not split for sending
 	unsigned numberOfUnsplitMessages;
 	///  Number of messages split for sending
 	unsigned numberOfSplitMessages;
 	///  Total number of splits done for sending
 	unsigned totalSplits;
-	
+
 	///  Total packets sent
 	unsigned packetsSent;
-	
+
 	///  Number of bits added by encryption
-	unsigned encryptionBitsSent;
+	uint64_t encryptionBitsSent;
 	///  total bits sent
-	unsigned totalBitsSent;
-	
+	uint64_t totalBitsSent;
+
 	///  Number of sequenced messages arrived out of order
 	unsigned sequencedMessagesOutOfOrder;
 	///  Number of sequenced messages arrived in order
 	unsigned sequencedMessagesInOrder;
-	
+
 	///  Number of ordered messages arrived out of order
 	unsigned orderedMessagesOutOfOrder;
 	///  Number of ordered messages arrived in order
 	unsigned orderedMessagesInOrder;
-	
+
 	///  Packets with a good CRC received
 	unsigned packetsReceived;
 	///  Packets with a bad CRC received
 	unsigned packetsWithBadCRCReceived;
 	///  Bits with a good CRC received
-	unsigned bitsReceived;
+	uint64_t bitsReceived;
 	///  Bits with a bad CRC received
-	unsigned bitsWithBadCRCReceived;
+	uint64_t bitsWithBadCRCReceived;
 	///  Number of acknowledgement messages received for packets we are resending
 	unsigned acknowlegementsReceived;
 	///  Number of acknowledgement messages received for packets we are not resending
@@ -110,7 +117,14 @@ struct RAK_DLL_EXPORT RakNetStatisticsStruct
 	///  connection start time
 	RakNetTime connectionStartTime;
 
-	RakNetStatisticsStruct operator +=(const RakNetStatisticsStruct& other)
+	RakNetTime field_110;
+	unsigned field_114;
+	unsigned field_118;
+	RakNetTime field_11C;
+	unsigned field_120;
+	unsigned field_124;
+
+	void operator +=(const RakNetStatisticsStruct& other)
 	{
 		unsigned i;
 		for (i=0; i < NUMBER_OF_PRIORITIES; i++)
@@ -151,18 +165,9 @@ struct RAK_DLL_EXPORT RakNetStatisticsStruct
 		duplicateMessagesReceived+=other.duplicateMessagesReceived;
 		messagesWaitingForReassembly+=other.messagesWaitingForReassembly;
 		internalOutputQueueSize+=other.internalOutputQueueSize;
-
-		return *this;
 	}
 };
 
-/// Verbosity level currently supports 0 (low), 1 (medium), 2 (high)
-/// \param[in] s The Statistical information to format out
-/// \param[in] buffer The buffer containing a formated report
-/// \param[in] verbosityLevel 
-/// 0 low
-/// 1 medium 
-/// 2 high 
 void StatisticsToString( RakNetStatisticsStruct *s, char *buffer, int verbosityLevel );
 
 #endif

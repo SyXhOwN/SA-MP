@@ -53,25 +53,28 @@ static cell AMX_NATIVE_CALL n_GetActorPoolSize(AMX *amx, cell *params)
 }
 
 //----------------------------------------------------------------------------------
-
+// native print(const string[])
 static cell AMX_NATIVE_CALL n_print(AMX *amx, cell *params)
 {
 	// TODO: print
 	return 0;
 }
 
+// native printf(const format[], {Float,_}:...)
 static cell AMX_NATIVE_CALL n_printf(AMX *amx, cell *params)
 {
 	// TODO: printf
 	return 0;
 }
 
+// native format(output[], len, const format[], {Float,_}:...)
 static cell AMX_NATIVE_CALL n_format(AMX *amx, cell *params)
 {
 	// TODO: format
 	return 0;
 }
 
+// native SetTimer(funcname[], interval, repeating)
 static cell AMX_NATIVE_CALL n_SetTimer(AMX *amx, cell *params)
 {
 	char* szFuncName;
@@ -79,6 +82,7 @@ static cell AMX_NATIVE_CALL n_SetTimer(AMX *amx, cell *params)
 	return pNetGame->GetTimers()->New(szFuncName, params[2], params[3], amx);
 }
 
+// native KillTimer(timerid)
 static cell AMX_NATIVE_CALL n_KillTimer(AMX *amx, cell *params)
 {
 	pNetGame->GetTimers()->Kill(params[1]);
@@ -103,7 +107,7 @@ static cell AMX_NATIVE_CALL n_GetMaxPlayers(AMX *amx, cell *params)
 }
 
 //----------------------------------------------------------------------------------
-
+// native SetTimerEx(funcname[], interval, repeating, const format[], {Float,_}:...)
 static cell AMX_NATIVE_CALL n_SetTimerEx(AMX *amx, cell *params)
 {
 	if (params[0] < 4 * sizeof (cell))
@@ -147,7 +151,7 @@ static cell AMX_NATIVE_CALL n_LimitPlayerMarkerRadius(AMX *amx, cell *params)
 }
 
 //----------------------------------------------------------------------------------
-
+// native SetWeather(weatherid)
 static cell AMX_NATIVE_CALL n_SetWeather(AMX *amx, cell *params)
 {
 	// TODO: SetWeather
@@ -160,12 +164,14 @@ static cell AMX_NATIVE_CALL n_SetPlayerWeather(AMX *amx, cell *params)
 	return 0;
 }
 
+// native CallRemoteFunction(const function[], const format[], {Float,_}:...)
 static cell AMX_NATIVE_CALL n_CallRemoteFunction(AMX *amx, cell *params)
 {
 	// TODO: CallRemoteFunction
 	return 0;
 }
 
+// native CallLocalFunction(const function[], const format[], {Float,_}:...)
 static cell AMX_NATIVE_CALL n_CallLocalFunction(AMX *amx, cell *params)
 {
 	// TODO: CallLocalFunction
@@ -186,24 +192,28 @@ static cell AMX_NATIVE_CALL n_VectorSize(AMX *amx, cell *params)
 
 //----------------------------------------------------------------------------------
 
+// native Float:asin(Float:value)
 static cell AMX_NATIVE_CALL n_asin(AMX *amx, cell *params)
 {
 	float fResult = (float)(asin(amx_ctof(params[1])) * (180.0f / PI));
 	return amx_ftoc(fResult);
 }
 
+// native Float:acos(Float:value)
 static cell AMX_NATIVE_CALL n_acos(AMX *amx, cell *params)
 {
 	float fResult = (float)(acos(amx_ctof(params[1])) * (180.0f / PI));
 	return amx_ftoc(fResult);
 }
 
+// native Float:atan(Float:value)
 static cell AMX_NATIVE_CALL n_atan(AMX *amx, cell *params)
 {
 	float fResult = (float)(atan(amx_ctof(params[1])) * (180.0f / PI));
 	return amx_ftoc(fResult);
 }
 
+// native Float:atan2(Float:x, Float:y)
 static cell AMX_NATIVE_CALL n_atan2(AMX *amx, cell *params)
 {
 	float fResult = (float)(atan2(amx_ctof(params[1]), amx_ctof(params[2])) * (180.0f / PI));
@@ -212,66 +222,77 @@ static cell AMX_NATIVE_CALL n_atan2(AMX *amx, cell *params)
 
 //----------------------------------------------------
 
+// native SHA256_PassHash(password[], salt[], ret_hash[], ret_hash_len)
 static cell AMX_NATIVE_CALL n_SHA256_PassHash(AMX *amx, cell *params)
 {
 	// TODO: SHA256_PassHash
 	return 0;
 }
 
+// native SetSVarInt(varname[], int_value)
 static cell AMX_NATIVE_CALL n_SetSVarInt(AMX *amx, cell *params)
 {
 	// TODO: SetSVarInt
 	return 0;
 }
 
+// native SetSVarString(varname[], string_value[])
 static cell AMX_NATIVE_CALL n_SetSVarString(AMX *amx, cell *params)
 {
 	// TODO: SetSVarString
 	return 0;
 }
 
+// native SetSVarFloat(varname[], Float:float_value)
 static cell AMX_NATIVE_CALL n_SetSVarFloat(AMX *amx, cell *params)
 {
 	// TODO: SetSVarFloat
 	return 0;
 }
 
+// native GetSVarInt(varname[])
 static cell AMX_NATIVE_CALL n_GetSVarInt(AMX *amx, cell *params)
 {
 	// TODO: GetSVarInt
 	return 0;
 }
 
+// native GetSVarString(varname[], string_return[], len)
 static cell AMX_NATIVE_CALL n_GetSVarString(AMX *amx, cell *params)
 {
 	// TODO: GetSVarString
 	return 0;
 }
 
+// native Float:GetSVarFloat(varname[])
 static cell AMX_NATIVE_CALL n_GetSVarFloat(AMX *amx, cell *params)
 {
 	// TODO: GetSVarFloat
 	return 0;
 }
 
+// native DeleteSVar(varname[])
 static cell AMX_NATIVE_CALL n_DeleteSVar(AMX *amx, cell *params)
 {
 	// TODO: DeleteSVar
 	return 0;
 }
 
+// native GetSVarType(varname[])
 static cell AMX_NATIVE_CALL n_GetSVarType(AMX *amx, cell *params)
 {
 	// TODO: GetSVarType
 	return 0;
 }
 
+// native GetSVarNameAtIndex(index, ret_varname[], ret_len)
 static cell AMX_NATIVE_CALL n_GetSVarNameAtIndex(AMX *amx, cell *params)
 {
 	// TODO: GetSVarNameAtIndex
 	return 0;
 }
 
+// native GetSVarsUpperIndex()
 static cell AMX_NATIVE_CALL n_GetSVarsUpperIndex(AMX *amx, cell *params)
 {
 	// TODO: GetSVarsUpperIndex
@@ -307,42 +328,49 @@ static cell AMX_NATIVE_CALL n_SetTeamCount(AMX *amx, cell *params)
 	return 0;
 }
 
+// native AddPlayerClass(modelid, Float:spawn_x, Float:spawn_y, Float:spawn_z, Float:z_angle, weapon1, weapon1_ammo, weapon2, weapon2_ammo, weapon3, weapon3_ammo)
 static cell AMX_NATIVE_CALL n_AddPlayerClass(AMX *amx, cell *params)
 {
 	// TODO: AddPlayerClass
 	return 0;
 }
 
+// native AddPlayerClassEx(teamid, modelid, Float:spawn_x, Float:spawn_y, Float:spawn_z, Float:z_angle, weapon1, weapon1_ammo, weapon2, weapon2_ammo, weapon3, weapon3_ammo)
 static cell AMX_NATIVE_CALL n_AddPlayerClassEx(AMX *amx, cell *params)
 {
 	// TODO: AddPlayerClassEx
 	return 0;
 }
 
+// native AddStaticVehicle(modelid, Float:spawn_x, Float:spawn_y, Float:spawn_z, Float:z_angle, color1, color2)
 static cell AMX_NATIVE_CALL n_AddStaticVehicle(AMX *amx, cell *params)
 {
 	// TODO: AddStaticVehicle
 	return 0;
 }
 
+// native AddStaticVehicleEx(modelid, Float:spawn_x, Float:spawn_y, Float:spawn_z, Float:z_angle, color1, color2, respawn_delay, addsiren=0)
 static cell AMX_NATIVE_CALL n_AddStaticVehicleEx(AMX *amx, cell *params)
 {
 	// TODO: AddStaticVehicleEx
 	return 0;
 }
 
+// native AddStaticPickup(model, type, Float:X, Float:Y, Float:Z, virtualworld = 0)
 static cell AMX_NATIVE_CALL n_AddStaticPickup(AMX *amx, cell *params)
 {
 	// TODO: AddStaticPickup
 	return 0;
 }
 
+// native CreatePickup(model, type, Float:X, Float:Y, Float:Z, virtualworld = 0)
 static cell AMX_NATIVE_CALL n_CreatePickup(AMX *amx, cell *params)
 {
 	// TODO: CreatePickup
 	return 0;
 }
 
+// native DestroyPickup(pickup)
 static cell AMX_NATIVE_CALL n_DestroyPickup(AMX *amx, cell *params)
 {
 	// TODO: DestroyPickup
@@ -375,6 +403,7 @@ static cell AMX_NATIVE_CALL n_ShowPlayerMarkers(AMX *amx, cell *params)
 
 //----------------------------------------------------------------------------------
 
+// native SetWorldTime(hour)
 static cell AMX_NATIVE_CALL n_SetWorldTime(AMX *amx, cell *params)
 {
 	// TODO: SetWorldTime
@@ -417,6 +446,7 @@ static cell AMX_NATIVE_CALL n_AllowInteriorWeapons(AMX *amx, cell *params)
 
 //----------------------------------------------------------------------------------
 
+// native SetGravity(Float:gravity)
 static cell AMX_NATIVE_CALL n_SetGravity(AMX *amx, cell *params)
 {
 	// TODO: SetGravity
@@ -448,7 +478,7 @@ static cell AMX_NATIVE_CALL n_SetDeathDropAmount(AMX *amx, cell *params)
 }
 
 //----------------------------------------------------------------------------------
-
+// native CreateExplosion(Float:X, Float:Y, Float:Z, type, Float:Radius)
 static cell AMX_NATIVE_CALL n_CreateExplosion(AMX *amx, cell *params)
 {
 	// TODO: CreateExplosion
@@ -461,6 +491,7 @@ static cell AMX_NATIVE_CALL n_CreateExplosionForPlayer(AMX *amx, cell *params)
 	return 0;
 }
 
+// 
 static cell AMX_NATIVE_CALL n_SetDisabledWeapons(AMX *amx, cell *params)
 {
 	logprintf("[warning] SetDisabledWeapons() : function is deprecated. Check weapon in OnPlayerUpdate.");
@@ -497,6 +528,7 @@ static cell AMX_NATIVE_CALL n_DisableNameTagLOS(AMX *amx, cell *params)
 	return 1;
 }
 
+// native ConnectNPC(name[], script[])
 static cell AMX_NATIVE_CALL n_ConnectNPC(AMX *amx, cell *params)
 {
 	// TODO: ConnectNPC
@@ -1029,8 +1061,15 @@ static cell AMX_NATIVE_CALL n_GetPlayerSurfingObjectID(AMX *amx, cell *params)
 	return 0xFFFF;
 }
 
+// native PutPlayerInVehicle(playerid, vehicleid, seatid)
 static cell AMX_NATIVE_CALL n_PutPlayerInVehicle(AMX *amx, cell *params)
 {
+	CPlayerPool *pPlayerPool = pNetGame->GetPlayerPool();
+	if(!pPlayerPool) return 0;
+
+	CVehiclePool *pVehiclePool = pNetGame->GetVehiclePool();
+	if(!pVehiclePool) return 0;
+
 	// TODO: PutPlayerInVehicle
 	return 0;
 }
@@ -2167,9 +2206,13 @@ static cell AMX_NATIVE_CALL n_SetVehicleVirtualWorld(AMX *amx, cell *params)
 	return 0;
 }
 
+// native GetVehicleVirtualWorld(vehicleid)
 static cell AMX_NATIVE_CALL n_GetVehicleVirtualWorld(AMX *amx, cell *params)
 {
-	// TODO: GetVehicleVirtualWorld
+	if (pNetGame->GetVehiclePool()->GetSlotState((VEHICLEID)params[1]))
+	{
+		return pNetGame->GetVehiclePool()->GetVehicleVirtualWorld((VEHICLEID)params[1]);
+	}
 	return 0;
 }
 
@@ -2672,64 +2715,105 @@ static cell AMX_NATIVE_CALL n_IsActorInvulnerable(AMX *amx, cell *params)
 	return 0;
 }
 
+// Menus
+
+// native Menu:CreateMenu(const title[], columns, Float:x, Float:y, Float:col1width, Float:col2width = 0.0);
 static cell AMX_NATIVE_CALL n_CreateMenu(AMX *amx, cell *params)
 {
-	// TODO: CreateMenu
-	return 0;
+	CMenuPool* pMenuPool = pNetGame->GetMenuPool();
+	if (!pMenuPool) return -1;
+	char* szMenuTitle;
+	amx_StrParam(amx, params[1], szMenuTitle);
+	BYTE menuid = pMenuPool->New(szMenuTitle, amx_ctof(params[3]), amx_ctof(params[4]), params[2], amx_ctof(params[5]), amx_ctof(params[6]));
+	if (menuid == 0xFF) return -1;
+	return menuid;
 }
 
+// native DestroyMenu(Menu:menuid);
 static cell AMX_NATIVE_CALL n_DestroyMenu(AMX *amx, cell *params)
 {
-	// TODO: DestroyMenu
+	CMenuPool* pMenuPool = pNetGame->GetMenuPool();
+	if (!pMenuPool) return 0;
+	if (pMenuPool->Delete(params[1])) return 1;
 	return 0;
 }
 
+// native AddMenuItem(Menu:menuid, column, const menutext[]);
 static cell AMX_NATIVE_CALL n_AddMenuItem(AMX *amx, cell *params)
 {
-	// TODO: AddMenuItem
-	return 0;
+	CMenuPool* pMenuPool = pNetGame->GetMenuPool();
+	if (!pMenuPool) return 0;
+	char* szItemText;
+	amx_StrParam(amx, params[3], szItemText);
+	BYTE ret = pMenuPool->GetAt((BYTE)params[1])->AddMenuItem(params[2], szItemText);
+	if (ret == 0xFF) return -1;
+	return ret;
 }
 
+// native SetMenuColumnHeader(Menu:menuid, column, const columnheader[]);
 static cell AMX_NATIVE_CALL n_SetMenuColumnHeader(AMX *amx, cell *params)
 {
-	// TODO: SetMenuColumnHeader
-	return 0;
+	CMenuPool* pMenuPool = pNetGame->GetMenuPool();
+	if (!pMenuPool) return 0;
+	char* szItemText;
+	amx_StrParam(amx, params[3], szItemText);
+	pMenuPool->GetAt((BYTE)params[1])->SetColumnTitle(params[2], szItemText);
+	return 1;
 }
 
+// native ShowMenuForPlayer(Menu:menuid, playerid);
 static cell AMX_NATIVE_CALL n_ShowMenuForPlayer(AMX *amx, cell *params)
 {
-	// TODO: ShowMenuForPlayer
-	return 0;
+	if (!pNetGame->GetPlayerPool()->GetSlotState((PLAYERID)params[2])) return 0;
+	CMenuPool* pMenuPool = pNetGame->GetMenuPool();
+	if (!pMenuPool) return 0;
+	pMenuPool->GetAt((BYTE)params[1])->ShowForPlayer((PLAYERID)params[2]);
+	pMenuPool->SetPlayerMenu((PLAYERID)params[2], (BYTE)params[1]);
+	return 1;
 }
 
+// native HideMenuForPlayer(Menu:menuid, playerid);
 static cell AMX_NATIVE_CALL n_HideMenuForPlayer(AMX *amx, cell *params)
 {
-	// TODO: HideMenuForPlayer
-	return 0;
+	if (!pNetGame->GetPlayerPool()->GetSlotState((PLAYERID)params[2])) return 0;
+	CMenuPool* pMenuPool = pNetGame->GetMenuPool();
+	if (!pMenuPool) return 0;
+	pMenuPool->GetAt((BYTE)params[1])->HideForPlayer((PLAYERID)params[2]);
+	return 1;
 }
 
+// native IsValidMenu(Menu:menuid);
 static cell AMX_NATIVE_CALL n_IsValidMenu(AMX *amx, cell *params)
 {
-	// TODO: IsValidMenu
+	CMenuPool* pMenuPool = pNetGame->GetMenuPool();
+	if (pMenuPool && pMenuPool->GetSlotState(params[1])) return 1;
 	return 0;
 }
 
+// native DisableMenu(Menu:menuid);
 static cell AMX_NATIVE_CALL n_DisableMenu(AMX *amx, cell *params)
 {
-	// TODO: DisableMenu
-	return 0;
+	CMenuPool* pMenuPool = pNetGame->GetMenuPool();
+	if (!pMenuPool) return 0;
+	pMenuPool->GetAt((BYTE)params[1])->DisableInteraction();
+	return 1;
 }
 
+// native DisableMenuRow(Menu:menuid, row);
 static cell AMX_NATIVE_CALL n_DisableMenuRow(AMX *amx, cell *params)
 {
-	// TODO: DisableMenuRow
-	return 0;
+	CMenuPool* pMenuPool = pNetGame->GetMenuPool();
+	if (!pMenuPool) return 0;
+	pMenuPool->GetAt((BYTE)params[1])->DisableRow((BYTE)params[2]);
+	return 1;
 }
 
+// native Menu:GetPlayerMenu(playerid);
 static cell AMX_NATIVE_CALL n_GetPlayerMenu(AMX *amx, cell *params)
 {
-	// TODO: GetPlayerMenu
-	return 0;
+	CMenuPool* pMenuPool = pNetGame->GetMenuPool();
+	if (!pMenuPool) return 255;
+	return pMenuPool->GetPlayerMenu((PLAYERID)params[1]);
 }
 
 static cell AMX_NATIVE_CALL n_SetPlayerTime(AMX *amx, cell *params)
@@ -2752,6 +2836,8 @@ static cell AMX_NATIVE_CALL n_GetPlayerTime(AMX *amx, cell *params)
 
 static cell AMX_NATIVE_CALL n_HTTP(AMX *amx, cell *params)
 {
+	if(!pNetGame) return 0;
+
 	// TODO: HTTP
 	return 0;
 }

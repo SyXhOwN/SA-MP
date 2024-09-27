@@ -33,6 +33,7 @@ private:
 public:
 	CUnkClass5(IDirect3DDevice9 *pD3DDevice);
 
+	void ResetDialog();
 	void ResetDialogControls(CDXUTDialog *pDialog);
 
 };

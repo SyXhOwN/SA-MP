@@ -443,3 +443,73 @@ void RwFrameRotate(RwFrame* frame, int axis, float angle)
 	_asm pop edx
 }
 
+void RpHAnimHierarchyUpdateMatrices(RpClump *clump)
+{
+	_asm push clump
+	_asm mov edx, 0x734A40 ; GetAnimHierarchyFromSkinClump
+	_asm call edx
+	_asm pop edx
+
+	_asm push eax
+	_asm mov edx, 0x7C51D0 ; RpHAnimHierarchyUpdateMatrices
+	_asm call edx
+	_asm pop edx
+}
+
+void RpAnimBlendClumpUpdateAnimations(RpClump *pClump, float fStep, int iOnScreen)
+{
+	_asm push iOnScreen
+	_asm push fStep
+	_asm push pClump
+	_asm mov edx, 0x4D34F0
+	_asm call edx
+	_asm pop edx
+	_asm pop edx
+	_asm pop edx
+}
+
+RwStream * RwStreamOpen(int iStreamType, int iAccessType, void *pData)
+{
+	RwStream *pResult = NULL;
+	DWORD dwFunc = (iGtaVersion != GTASA_VERSION_USA10) ? 0x7ECF30 : 0x7ECEF0;
+
+	_asm push pData
+	_asm push iAccessType
+	_asm push iStreamType
+	_asm mov eax, dwFunc
+	_asm call eax
+	_asm mov pResult, eax
+	_asm pop eax
+	_asm pop eax
+	_asm pop eax
+
+	return pResult;
+}
+
+int RwStreamClose(RwStream *pStream, void *pData)
+{
+	int bResult = 0;
+	DWORD dwFunc = (iGtaVersion != GTASA_VERSION_USA10) ? 0x7ECE60 : 0x7ECE20;
+
+	_asm push pData
+	_asm push pStream
+	_asm mov eax, dwFunc
+	_asm call eax
+	_asm mov bResult, eax
+	_asm pop eax
+	_asm pop eax
+
+	return bResult;
+}
+
+/*UINT RwStreamRead(RwStream *pStream, void *pBuffer, UINT uiLength)
+{
+  return ((int (__cdecl *)(_DWORD, _DWORD, _DWORD, _DWORD, _DWORD))(iGtaVersion != 1 ? 0x7ECA10 : 0x7EC9D0))(
+           pStream,
+           pBuffer,
+           uiLength,
+           iGtaVersion != 1 ? 0x7ECA10 : 0x7EC9D0,
+           0);
+}*/
+
+

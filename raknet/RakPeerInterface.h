@@ -462,6 +462,8 @@ public:
 	/// \sa RakNetStatistics.h
 	virtual RakNetStatisticsStruct * const GetStatistics( const PlayerID playerId )=0;
 
+	virtual RakNetTime GetTimestampFromPlayerID( const PlayerID playerId, RakNetTime time ) const=0;
+
 	// --------------------------------------------------------------------------------------------EVERYTHING AFTER THIS COMMENT IS FOR INTERNAL USE ONLY--------------------------------------------------------------------------------------------
 	/// \internal
 	virtual RPCMap *GetRPCMap( const PlayerID playerId)=0;

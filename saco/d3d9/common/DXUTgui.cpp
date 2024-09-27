@@ -551,6 +551,29 @@ int CDXUTDialogResourceManager::AddFont( LPCTSTR strFaceName, LONG height, LONG 
 
 
 //--------------------------------------------------------------------------------------
+int CDXUTDialogResourceManager::SetFont(UINT iFont, LPCTSTR strFaceName, LONG height, LONG weight)
+{
+	DXUTFontNode* pFontNode = m_FontCache.GetAt(iFont);
+	if( pFontNode != NULL )
+	{
+		StringCchCopy( pFontNode->strFace, MAX_PATH, strFaceName );
+	    pFontNode->nHeight = height;
+	    pFontNode->nWeight = weight;
+
+		// If a device is available, try to create immediately
+	    if( m_pd3dDevice )
+	        CreateFont( iFont );
+
+		return iFont;
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+
+//--------------------------------------------------------------------------------------
 // MATCH
 HRESULT CDXUTDialog::SetFont( UINT index, LPCTSTR strFaceName, LONG height, LONG weight )
 {
@@ -5650,7 +5673,7 @@ BOOL (APIENTRY * CDXUTIMEEditBox::_VerQueryValueA)( const LPVOID, LPSTR, LPVOID 
 BOOL (APIENTRY * CDXUTIMEEditBox::_GetFileVersionInfoA)( LPSTR, DWORD, DWORD, LPVOID )= CDXUTIMEEditBox::Dummy_GetFileVersionInfoA;
 DWORD (APIENTRY * CDXUTIMEEditBox::_GetFileVersionInfoSizeA)( LPSTR, LPDWORD ) = CDXUTIMEEditBox::Dummy_GetFileVersionInfoSizeA;
 
-DWORD dwImeWaitTick;
+int nImeWaitTick;
 
 HINSTANCE CDXUTIMEEditBox::s_hDllImm32;      // IMM32 DLL handle
 HINSTANCE CDXUTIMEEditBox::s_hDllVer;        // Version DLL handle
@@ -6694,7 +6717,7 @@ bool CDXUTIMEEditBox::MsgProc( UINT uMsg, WPARAM wParam, LPARAM lParam )
             s_bHideCaret = false;
             // Hide reading window
             s_bShowReadingWindow = false;
-			dwImeWaitTick = GetTickCount();
+			nImeWaitTick = GetTickCount();
             break;
 
         case WM_IME_NOTIFY:
@@ -7811,7 +7834,7 @@ void CDXUTIMEEditBox::Initialize()
 
     FARPROC Temp;
 
-	dwImeWaitTick = GetTickCount();
+	nImeWaitTick = GetTickCount();
 
     s_CompString.SetBufferSize( MAX_COMPSTRING_SIZE );
 
@@ -7903,6 +7926,18 @@ void CDXUTIMEEditBox::Uninitialize()
         FreeLibrary( s_hDllVer );
         s_hDllVer = NULL;
     }
+}
+
+
+//--------------------------------------------------------------------------------------
+bool CDXUTIMEEditBox::FUNC_100863E0()
+{
+	if(s_CandList.bShowWindow) return true;
+	if(s_bShowReadingWindow) return true;
+
+	if(((int)GetTickCount() - nImeWaitTick) < 300)
+		return true;
+	return false;
 }
 
 

@@ -14,8 +14,8 @@ public:
 	short field_92;
 	char field_94[68];
 	char field_D8[24];
-	int field_F0;
-	int field_F4;
+	BOOL					m_bIsActive;
+	BOOL					m_bIsWasted;
 
 	char _gapF8[2];
 
@@ -24,7 +24,7 @@ public:
 	int field_100;
 	CPlayerPed				*m_pPlayerPed;
 	BOOL					m_bIsSpectating;
-	char field_10C;
+	BYTE					m_byteTeam;
 	short field_10D;
 	DWORD field_10F;
 	DWORD field_113;
@@ -48,7 +48,7 @@ public:
 
 	char _gap14B[50];
 
-	int field_17D;
+	BOOL					m_bHasSpawnInfo;
 	DWORD field_181;
 	short field_185;
 	short field_187;
@@ -80,7 +80,7 @@ public:
 	char _gap30E;
 
 	char field_30F;
-	int field_310;
+	DWORD					m_SpectateID; // Vehicle or player id
 
 	char _gap314[4];
 
@@ -92,8 +92,17 @@ public:
 
 	void ResetAllSyncAttributes();
 
+	BOOL Spawn();
+
 	void Say(PCHAR szText);
 
+	void SetPlayerColor(DWORD dwColor);
+	DWORD GetPlayerColorAsRGBA();
+	DWORD GetPlayerColorAsARGB();
+	void ProcessOnFootWorldBounds();
+	void ProcessInCarWorldBounds();
+
+	void ToggleSpectating(BOOL bToggle);
 	BOOL IsSpectating() { return m_bIsSpectating; };
 
 	BOOL IsInRCMode() { return m_bInRCMode; };

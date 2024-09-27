@@ -27,13 +27,13 @@ int dword_10125A58=0;
 void DumpNetworkStateInformation(PCHAR sz)
 {
 	CPlayerPool   *pPlayerPool = pNetGame->GetPlayerPool();
-	PLAYERID playerId=0;
 
 	sz[0] = '\0';
 
 	sprintf(sz,"\r\nState Information: Ped Context: %u\r\n",*pbyteCurrentPlayer);
 
-	// TODO: DumpNetworkStateInformation 10060160
+
+
 }
 
 //----------------------------------------------------

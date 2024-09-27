@@ -25,8 +25,75 @@ CPlayerPool::~CPlayerPool()
 	}
 }
 
+//----------------------------------------------------
+
+BOOL CPlayerPool::New(PLAYERID playerId, PCHAR szPlayerName, PCHAR szClientID, PCHAR szVersion, BOOL bIsNPC)
+{
+	if(playerId > MAX_PLAYERS) return FALSE;
+	if(strlen(szPlayerName) > MAX_PLAYER_NAME) return FALSE;
+
+	m_pPlayers[playerId] = new CPlayer();
+
+	if(m_pPlayers[playerId])
+	{
+		strcpy(m_szPlayerName[playerId],szPlayerName);
+		memset(m_szPlayerClientID[playerId],0,sizeof(m_szPlayerClientID[playerId]));
+		memset(m_szPlayerVersion[playerId],0,sizeof(m_szPlayerVersion[playerId]));
+
+		if(szClientID) {
+			if(strlen(szClientID) >= 100)
+				return FALSE;
+			strcpy(m_szPlayerClientID[playerId],szClientID);
+		}
+
+		if(szVersion) {
+			if(strlen(szVersion) >= 24)
+				return FALSE;
+			strcpy(m_szPlayerVersion[playerId],szVersion);
+		}
+
+		m_bPlayerSlotState[playerId] = TRUE;
+		m_iPlayerScore[playerId] = 0;
+		m_iPlayerMoney[playerId] = 0;
+		m_bIsAnAdmin[playerId] = FALSE;
+		m_iVirtualWorld[playerId] = 0;
+		m_iPlayerDrunkLevel[playerId] = 0;
+
+		BYTE byteIsNPC;
+		if(bIsNPC) {
+			m_bIsAnNPC[playerId] = TRUE;
+			byteIsNPC = 1;
+		} else {
+			m_bIsAnNPC[playerId] = FALSE;
+			byteIsNPC = 0;
+		}
+
+		// Notify all the other players of a newcommer with
+		// a 'ServerJoin' join RPC 
+		RakNet::BitStream bsSend;
+		bsSend.Write(playerId);
+		bsSend.Write((DWORD)0);
+		bsSend.Write(byteIsNPC);
+		BYTE namelen = strlen(szPlayerName);
+		bsSend.Write(namelen);
+		bsSend.Write(szPlayerName,namelen);
+
+		return TRUE;
+	}
+	else
+	{
+		return FALSE;
+	}
+}
+
 BOOL CPlayerPool::Delete(PLAYERID playerId, BYTE byteReason)
 {
 	// TODO: CPlayerPool::Delete W .text:00466570 L .text:080D0A90
 	return FALSE;
+}
+
+BOOL CPlayerPool::Process(float fElapsedTime)
+{
+	// TODO: CPlayerPool::Process
+	return TRUE;
 }

@@ -18,6 +18,19 @@ CUnkClass3::CUnkClass3(IDirect3DDevice9 *pD3DDevice)
 	memset(field_89, 0, sizeof(field_89));
 }
 
+int CUnkClass3::MsgProc(UINT uMsg, DWORD wParam, DWORD lParam)
+{
+	if(m_pEditControl->StaticMsgProc(uMsg, wParam, lParam)) return TRUE;
+	return FALSE;
+}
+
+bool CUnkClass3::FUNC_1006F4F0()
+{
+	if(m_pEditControl)
+		return m_pEditControl->FUNC_100863E0();
+	return false;
+}
+
 void CUnkClass3::ResetDialogControls(CDXUTDialog *pDialog)
 {
 	m_pDialog = pDialog;

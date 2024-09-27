@@ -22,6 +22,7 @@
 
 #define ADDR_ENABLE_HUD							0xBA6769
 
+//#define ADDR_ID_FROM_ACTOR					0x451CF0
 #define ADDR_ID_FROM_ACTOR						0x4442D0
 #define ADDR_ACTOR_FROM_ID						0x404910  // Converts id to actor ptr
 #define ADDR_PED_TABLE							0xB74490  // Contains ptr to actor/ped table

@@ -18,6 +18,8 @@ public:
 
 	BOOL Delete(WORD wObjectID);
 	BOOL DeleteForPlayer(PLAYERID playerId, WORD wObjectID);
+
+	void Process(float fElapsedTime);
 };
 
 #endif

@@ -12,14 +12,14 @@ CRemotePlayer::CRemotePlayer()
 {
 	field_1E7 = 0;
 	field_10A = 0;
-	field_1E5 = -1;
-	field_1DD = 0;
+	m_PlayerID = INVALID_PLAYER_ID;
+	m_pPlayerPed = NULL;
 	field_1B8 = 0;
-	field_109 = -1;
+	field_109 = 255;
 	field_4 = 1;
 	field_0 = 0;
 	field_8 = 0;
-	field_1F9 = 0;
+	m_dwMarkerID = 0;
 	field_C = 0;
 	field_10C = 0;
 	field_1C1 = 0;
@@ -27,6 +27,25 @@ CRemotePlayer::CRemotePlayer()
 	field_1D9 = GetTickCount();
 	field_1B9 = GetTickCount();
 	ResetAllSyncAttributes();
+}
+
+//----------------------------------------------------
+
+CRemotePlayer::~CRemotePlayer()
+{
+	if(m_dwMarkerID)
+	{
+		pGame->DisableMarker(m_dwMarkerID);
+		m_dwMarkerID = 0;
+	}
+
+	field_1E9 = 0;
+
+	if(m_pPlayerPed)
+	{
+		pGame->DeletePlayer(m_pPlayerPed);
+		m_pPlayerPed = NULL;
+	}
 }
 
 //----------------------------------------------------
@@ -50,10 +69,10 @@ void CRemotePlayer::ResetAllSyncAttributes()
 	memset(field_AD, 0, sizeof(field_AD));
 	memset(field_8E, 0, sizeof(field_8E));
 	memset(field_1C9, 0, sizeof(field_1C9));
-	if(field_1F9)
+	if(m_dwMarkerID)
 	{
-		pGame->DisableMarker(field_1F9);
-		field_1F9 = 0;
+		pGame->DisableMarker(m_dwMarkerID);
+		m_dwMarkerID = 0;
 	}
 	field_1E9 = 0;
 	if(pNetGame)

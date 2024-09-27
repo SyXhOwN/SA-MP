@@ -1,6 +1,13 @@
 
 #include "../main.h"
 
+using namespace RakNet;
+extern CNetGame*	pNetGame;
+extern CGame * pGame;
+
+//----------------------------------------------------
+
+// TODO: These script RPCs
 void ScrUnkA7(RPCParameters *rpcParams) {}
 void ScrUnk38(RPCParameters *rpcParams) {}
 void ScrUnk90(RPCParameters *rpcParams) {}
@@ -53,7 +60,6 @@ void ScrUnk70(RPCParameters *rpcParams) {}
 void ScrSetSpawnInfo(RPCParameters *rpcParams) {}
 void ScrUnk45(RPCParameters *rpcParams) {}
 void ScrUnk99(RPCParameters *rpcParams) {}
-void ScrUnk0B(RPCParameters *rpcParams) {}
 void ScrSetPlayerPos(RPCParameters *rpcParams) {}
 void ScrUnk0D(RPCParameters *rpcParams) {}
 void ScrUnk0E(RPCParameters *rpcParams) {}
@@ -61,13 +67,10 @@ void ScrPutPlayerInVehicle(RPCParameters *rpcParams) {}
 void ScrRemovePlayerFromVehicle(RPCParameters *rpcParams) {}
 void ScrSetPlayerColor(RPCParameters *rpcParams) {}
 void ScrDisplayGameText(RPCParameters *rpcParams) {}
-void ScrUnk9D(RPCParameters *rpcParams) {}
-void ScrUnk9E(RPCParameters *rpcParams) {}
 void ScrSetInterior(RPCParameters *rpcParams) {}
 void ScrUnk9F(RPCParameters *rpcParams) {}
 void ScrUnkA0(RPCParameters *rpcParams) {}
 void ScrUnkA1(RPCParameters *rpcParams) {}
-void ScrUnkA2(RPCParameters *rpcParams) {}
 void ScrUnk0F(RPCParameters *rpcParams) {}
 void ScrUnk10(RPCParameters *rpcParams) {}
 void ScrUnk11(RPCParameters *rpcParams) {}
@@ -101,6 +104,82 @@ void ScrUnk30(RPCParameters *rpcParams) {}
 void ScrInitMenu(RPCParameters *rpcParams) {}
 void ScrShowMenu(RPCParameters *rpcParams) {}
 void ScrHideMenu(RPCParameters *rpcParams) {}
+
+//----------------------------------------------------
+
+void ScrSetPlayerName(RPCParameters *rpcParams)
+{
+	PCHAR Data = reinterpret_cast<PCHAR>(rpcParams->input);
+	int iBitLength = rpcParams->numberOfBitsOfData;
+	PlayerID sender = rpcParams->sender;
+
+	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
+
+	CPlayerPool *pPlayerPool = pNetGame->GetPlayerPool();
+
+	PLAYERID playerId;
+	BYTE byteNickLen;
+	char szNewName[MAX_PLAYER_NAME+1];
+	BYTE byteSuccess;
+
+	bsData.Read(playerId);
+	bsData.Read(byteNickLen);
+
+	if(byteNickLen > MAX_PLAYER_NAME) return;
+
+	bsData.Read(szNewName, byteNickLen);
+	bsData.Read(byteSuccess);
+
+	szNewName[byteNickLen] = '\0';
+}
+
+//----------------------------------------------------
+
+void ScrSetCameraPos(RPCParameters *rpcParams)
+{
+	PCHAR Data = reinterpret_cast<PCHAR>(rpcParams->input);
+	int iBitLength = rpcParams->numberOfBitsOfData;
+	PlayerID sender = rpcParams->sender;
+
+	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
+	VECTOR vecPos;
+	bsData.Read(vecPos.X);
+	bsData.Read(vecPos.Y);
+	bsData.Read(vecPos.Z);
+	pGame->GetCamera()->SetPosition(vecPos.X,vecPos.Y,vecPos.Z,0.0f,0.0f,0.0f);
+}
+
+//----------------------------------------------------
+
+void ScrSetCameraLookAt(RPCParameters *rpcParams)
+{
+	PCHAR Data = reinterpret_cast<PCHAR>(rpcParams->input);
+	int iBitLength = rpcParams->numberOfBitsOfData;
+	PlayerID sender = rpcParams->sender;
+
+	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
+	VECTOR vecPos;
+	BYTE byteType;
+	bsData.Read(vecPos.X);
+	bsData.Read(vecPos.Y);
+	bsData.Read(vecPos.Z);
+	bsData.Read(byteType);
+	if(byteType < 1 || byteType > 2) {
+		byteType = 2;
+	}
+	pGame->GetCamera()->LookAtPoint(vecPos.X,vecPos.Y,vecPos.Z,byteType);
+}
+
+//----------------------------------------------------
+
+void ScrSetCameraBehindPlayer(RPCParameters *rpcParams)
+{
+	PCHAR Data = reinterpret_cast<PCHAR>(rpcParams->input);
+	int iBitLength = rpcParams->numberOfBitsOfData;
+	PlayerID sender = rpcParams->sender;
+
+	pGame->GetCamera()->SetBehindPlayer();
+}
 
 //----------------------------------------------------
 
@@ -153,7 +232,7 @@ void RegisterScriptRPCs(RakClientInterface* pRakClient)
 	REGISTER_STATIC_RPC(pRakClient, ScrSetSpawnInfo);
 	REGISTER_STATIC_RPC(pRakClient, ScrUnk45);
 	REGISTER_STATIC_RPC(pRakClient, ScrUnk99);
-	REGISTER_STATIC_RPC(pRakClient, ScrUnk0B);
+	REGISTER_STATIC_RPC(pRakClient, ScrSetPlayerName);
 	REGISTER_STATIC_RPC(pRakClient, ScrSetPlayerPos);
 	REGISTER_STATIC_RPC(pRakClient, ScrUnk0D);
 	REGISTER_STATIC_RPC(pRakClient, ScrUnk0E);
@@ -161,13 +240,13 @@ void RegisterScriptRPCs(RakClientInterface* pRakClient)
 	REGISTER_STATIC_RPC(pRakClient, ScrRemovePlayerFromVehicle);
 	REGISTER_STATIC_RPC(pRakClient, ScrSetPlayerColor);
 	REGISTER_STATIC_RPC(pRakClient, ScrDisplayGameText);
-	REGISTER_STATIC_RPC(pRakClient, ScrUnk9D);
-	REGISTER_STATIC_RPC(pRakClient, ScrUnk9E);
 	REGISTER_STATIC_RPC(pRakClient, ScrSetInterior);
+	REGISTER_STATIC_RPC(pRakClient, ScrSetCameraPos);
+	REGISTER_STATIC_RPC(pRakClient, ScrSetCameraLookAt);
 	REGISTER_STATIC_RPC(pRakClient, ScrUnk9F);
 	REGISTER_STATIC_RPC(pRakClient, ScrUnkA0);
 	REGISTER_STATIC_RPC(pRakClient, ScrUnkA1);
-	REGISTER_STATIC_RPC(pRakClient, ScrUnkA2);
+	REGISTER_STATIC_RPC(pRakClient, ScrSetCameraBehindPlayer);
 	REGISTER_STATIC_RPC(pRakClient, ScrUnk0F);
 	REGISTER_STATIC_RPC(pRakClient, ScrUnk10);
 	REGISTER_STATIC_RPC(pRakClient, ScrUnk11);
@@ -260,7 +339,7 @@ void UnRegisterScriptRPCs(RakClientInterface* pRakClient)
 	UNREGISTER_STATIC_RPC(pRakClient, ScrUnk2B);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrSetSpawnInfo);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrUnk45);
-	UNREGISTER_STATIC_RPC(pRakClient, ScrUnk0B);
+	UNREGISTER_STATIC_RPC(pRakClient, ScrSetPlayerName);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrUnk99);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrSetPlayerPos);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrUnk0D);
@@ -269,13 +348,13 @@ void UnRegisterScriptRPCs(RakClientInterface* pRakClient)
 	UNREGISTER_STATIC_RPC(pRakClient, ScrRemovePlayerFromVehicle);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrSetPlayerColor);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrDisplayGameText);
-	UNREGISTER_STATIC_RPC(pRakClient, ScrUnk9D);
-	UNREGISTER_STATIC_RPC(pRakClient, ScrUnk9E);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrSetInterior);
+	UNREGISTER_STATIC_RPC(pRakClient, ScrSetCameraPos);
+	UNREGISTER_STATIC_RPC(pRakClient, ScrSetCameraLookAt);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrUnk9F);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrUnkA0);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrUnkA1);
-	UNREGISTER_STATIC_RPC(pRakClient, ScrUnkA2);
+	UNREGISTER_STATIC_RPC(pRakClient, ScrSetCameraBehindPlayer);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrUnk0F);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrUnk10);
 	UNREGISTER_STATIC_RPC(pRakClient, ScrUnk11);

@@ -5,8 +5,13 @@ CObjectPool::CObjectPool()
 {
 	for(WORD wObjectID = 0; wObjectID < MAX_OBJECTS; wObjectID++)
 	{
-		field_4[wObjectID] = 0;
-		field_FA4[wObjectID] = 0;
+		m_bObjectSlotState[wObjectID] = FALSE;
+		m_pObjects[wObjectID] = NULL;
 	}
 	field_0 = 0;
 };
+
+void CObjectPool::UpdatePoolSize()
+{
+	int iNewSize = 0;
+}

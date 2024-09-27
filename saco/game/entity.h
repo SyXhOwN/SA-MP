@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "game.h"
+
 //----------------------------------------------------------
 
 class CEntity
@@ -13,7 +15,7 @@ public:
 
 	void  GetMatrix(PMATRIX4X4 Matrix);
 	void  SetMatrix(MATRIX4X4 Matrix);
-	void  FUNC_1009EC80();
+	void  UpdateRwMatrixAndFrame();
 	void  GetMoveSpeedVector(PVECTOR Vector);
 	void  SetMoveSpeedVector(VECTOR Vector);
 	void  FUNC_1009ED40(float fX, float fY, float fZ); // unused
@@ -24,6 +26,7 @@ public:
 	void  GetBoundCentre(PVECTOR Vector);
 	void  GetBoundRect(PFRECT Rect); // unused
 	UINT  GetModelIndex();
+	BOOL  SetModelIndex(UINT uiModel);
 	void  TeleportTo(float x, float y, float z);
 	float GetDistanceFromLocalPlayerPed();
 	float GetDistanceFromCamera();

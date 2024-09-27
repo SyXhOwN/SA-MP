@@ -232,7 +232,6 @@ void __stdcall GameResetLocalPlayerWeaponSkills()
 	pfStats[78] = 999.0f; // m4
 	pfStats[79] = 999.0f; // sniper
 
-
 	GameStoreLocalPlayerWeaponSkills();
 }
 

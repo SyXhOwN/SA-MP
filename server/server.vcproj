@@ -3,7 +3,8 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="server"
-	ProjectGUID="{BD0C4C29-B3DF-4CAA-AFE4-F6C42A879C21}"
+	ProjectGUID="{1FA99388-7480-4F50-A42A-A02406C91F3A}"
+	RootNamespace="server"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -31,7 +32,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wsock32.lib winmm.lib"
+				AdditionalDependencies="wsock32.lib"
 				OutputFile="$(OutDir)/samp-server.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
@@ -83,7 +84,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wsock32.lib winmm.lib"
+				AdditionalDependencies="wsock32.lib"
 				OutputFile="$(OutDir)/samp-server.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
@@ -152,6 +153,9 @@
 			<Filter
 				Name="sqlite"
 				Filter="">
+				<File
+					RelativePath=".\sqlite\simplearray.h">
+				</File>
 				<File
 					RelativePath=".\sqlite\sqlite3.c">
 				</File>
@@ -741,10 +745,22 @@
 			RelativePath=".\exceptions.cpp">
 		</File>
 		<File
+			RelativePath=".\format.cpp">
+		</File>
+		<File
+			RelativePath=".\format.h">
+		</File>
+		<File
 			RelativePath=".\gangzonepool.cpp">
 		</File>
 		<File
 			RelativePath=".\gangzonepool.h">
+		</File>
+		<File
+			RelativePath=".\httpclient.cpp">
+		</File>
+		<File
+			RelativePath=".\httpclient.h">
 		</File>
 		<File
 			RelativePath=".\labelpool.cpp">
@@ -765,6 +781,12 @@
 			RelativePath=".\mathutils.h">
 		</File>
 		<File
+			RelativePath=".\menu.cpp">
+		</File>
+		<File
+			RelativePath=".\menu.h">
+		</File>
+		<File
 			RelativePath=".\menupool.cpp">
 		</File>
 		<File
@@ -781,6 +803,12 @@
 		</File>
 		<File
 			RelativePath=".\netrpc.h">
+		</File>
+		<File
+			RelativePath=".\object.cpp">
+		</File>
+		<File
+			RelativePath=".\object.h">
 		</File>
 		<File
 			RelativePath=".\objectpool.cpp">
@@ -807,16 +835,34 @@
 			RelativePath=".\plugininternal.h">
 		</File>
 		<File
+			RelativePath=".\pluginkey.h">
+		</File>
+		<File
 			RelativePath=".\plugins.cpp">
 		</File>
 		<File
 			RelativePath=".\plugins.h">
 		</File>
 		<File
+			RelativePath=".\query.cpp">
+		</File>
+		<File
 			RelativePath=".\resource.h">
 		</File>
 		<File
+			RelativePath=".\runutil.cpp">
+		</File>
+		<File
+			RelativePath=".\runutil.h">
+		</File>
+		<File
 			RelativePath=".\server.rc">
+		</File>
+		<File
+			RelativePath=".\signer.cpp">
+		</File>
+		<File
+			RelativePath=".\signer.h">
 		</File>
 		<File
 			RelativePath=".\system.h">
@@ -826,6 +872,12 @@
 		</File>
 		<File
 			RelativePath=".\textdrawpool.h">
+		</File>
+		<File
+			RelativePath=".\vehicle.cpp">
+		</File>
+		<File
+			RelativePath=".\vehicle.h">
 		</File>
 		<File
 			RelativePath=".\vehiclepool.cpp">

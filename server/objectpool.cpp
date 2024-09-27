@@ -29,6 +29,11 @@ CObjectPool::~CObjectPool()
 	}
 }
 
+void CObjectPool::Process(float fElapsedTime)
+{
+	// TODO: CObjectPool::Process
+}
+
 BOOL CObjectPool::Delete(WORD wObjectID)
 {
 	// TODO: CObjectPool::Delete W .text:004657A0 L .text:080C89A0

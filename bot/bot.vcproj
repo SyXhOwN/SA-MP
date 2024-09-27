@@ -68,10 +68,15 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="2"
+				InlineFunctionExpansion="1"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				StringPooling="TRUE"
+				MinimalRebuild="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="1"
 				BufferSecurityCheck="FALSE"
+				EnableFunctionLevelLinking="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
@@ -749,6 +754,12 @@
 		</File>
 		<File
 			RelativePath="..\server\system.h">
+		</File>
+		<File
+			RelativePath=".\unnamed_1.cpp">
+		</File>
+		<File
+			RelativePath=".\unnamed_1.h">
 		</File>
 	</Files>
 	<Globals>

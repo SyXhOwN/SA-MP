@@ -9,6 +9,8 @@ private:
 public:
 	CScriptHttps();
 	~CScriptHttps() {};
+
+	void Process();
 };
 
 #endif

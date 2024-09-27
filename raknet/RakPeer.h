@@ -471,6 +471,8 @@ public:
 	/// \sa RakNetStatistics.h
 	RakNetStatisticsStruct * const GetStatistics( const PlayerID playerId );
 
+	RakNetTime GetTimestampFromPlayerID( const PlayerID playerId, RakNetTime time ) const;
+
 	// --------------------------------------------------------------------------------------------EVERYTHING AFTER THIS COMMENT IS FOR INTERNAL USE ONLY--------------------------------------------------------------------------------------------
 	/// \internal
 	RPCMap *GetRPCMap( const PlayerID playerId);

@@ -219,7 +219,9 @@ public:
 
 	BYTE GetState() { return m_byteState; };
 
-	void Say(unsigned char * szText, BYTE byteTextLength);
+	CPlayer();
+
+	void ResetAllSyncAttributes();
 
 	void SetSpawnInfo(PLAYER_SPAWN_INFO *pSpawn);
 
@@ -234,6 +236,8 @@ public:
 	BOOL IsInCheckpoint() { return m_bInCheckpoint; };
 	BOOL IsInRaceCheckpoint() { return m_bInRaceCheckpoint; };
 
+	void StoreAimSyncData(AIM_SYNC_DATA *paimSync) {}
+	void Say(unsigned char * szText, BYTE byteTextLength) {}
 };
 
 //----------------------------------------------------

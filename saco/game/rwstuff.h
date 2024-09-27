@@ -10,6 +10,7 @@ struct RwRGBAReal { float r, g, b, a; };
 struct RpAtomic { char _gap0; };
 struct RwRGBA { char _gap0; };
 struct RpClump { char _gap0; };
+struct RwStream { char _gap0; };
 
 RwRaster* RwRasterCreate(int width, int height, int depth, int flags);
 RwTexture* RwTextureCreate(RwRaster *raster);
@@ -44,3 +45,9 @@ int RpClumpDestroy(RpClump *clump);
 void RwCameraSetProjection(RwCamera *camera, int projection);
 void RwFrameTranslate(RwFrame *frame, VECTOR *v, int combine);
 void RwFrameRotate(RwFrame* frame, int axis, float angle);
+
+void RpHAnimHierarchyUpdateMatrices(RpClump *clump);
+void RpAnimBlendClumpUpdateAnimations(RpClump *pClump, float fStep, int iOnScreen);
+RwStream * RwStreamOpen(int iStreamType, int iAccessType, void *pData);
+int RwStreamClose(RwStream *pStream, void *pData);
+

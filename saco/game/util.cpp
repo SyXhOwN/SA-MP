@@ -2,7 +2,10 @@
 #include <windows.h>
 #include <stdio.h>
 #include "../main.h"
+#include "modelinfo.h"
 #include <sys/stat.h>
+
+DWORD dwCameraScene = 0xC1703C;
 
 DWORD dwPlayerPedPtrs[PLAYER_PED_SLOTS];
 
@@ -1191,6 +1194,64 @@ OBJECT_TYPE * GamePool_GetObject()
 
 //-----------------------------------------------------------
 
+int Game_GetValidObjectCount()
+{
+	int dwObjectPool = 0xB7449C;
+	int iPoolSize = *(int *)(*(int*)dwObjectPool + 8);
+	int iCount = 0;
+
+	for(int i = 0; i < iPoolSize; i++)
+	{
+		if(*(BYTE *)(*(int*)dwObjectPool + i + 4) > 0)
+			iCount++;
+	}
+
+	return iCount;
+}
+
+//-----------------------------------------------------------
+
+int Game_GetValidTxdCount()
+{
+	DWORD *dwTxdPool = (DWORD *)0xC8800C;
+	int iPoolSize = *(int *)(*dwTxdPool + 8);
+	int iCount = 0;
+
+	for(int i = 0; i < iPoolSize; i++)
+	{
+		if(*(BYTE *)(*dwTxdPool + i + 4) > 0)
+			iCount++;
+	}
+
+	return iCount;
+}
+
+//-----------------------------------------------------------
+
+bool Game_IsObjectModelValid(int iModelID)
+{
+	OBJECT_TYPE *pObjectPtrs = GamePool_GetObject();
+	
+	//_asm mov eax, 0xB7449C
+	//_asm mov edx, [eax]
+//	_asm mov eax, [edx]
+//	_asm mov pObjectPtrs, eax
+
+	for(int i = 0; i != 3000; i++)
+	{
+		if(pObjectPtrs &&
+			pObjectPtrs[i].vtable != NULL &&
+			pObjectPtrs[i].vtable != 0x863C40 &&
+			pObjectPtrs[i].nModelIndex == iModelID)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+//-----------------------------------------------------------
+
 void ReplaceBuildingModel(ENTITY_TYPE *pEntity, int iModelID)
 {
 	_asm push iModelID
@@ -1198,6 +1259,20 @@ void ReplaceBuildingModel(ENTITY_TYPE *pEntity, int iModelID)
 	_asm mov edx, 0x403EC0
 	_asm call edx
 }
+
+//-----------------------------------------------------------
+
+
+
+
+
+// TODO: sub_100B3DB0
+// TODO: sub_100B3DD0
+
+
+
+
+
 
 //-----------------------------------------------------------
 
@@ -1356,6 +1431,83 @@ int __stdcall GameGetWeaponModelIDFromWeaponID(int iWeaponID)
 
 //-----------------------------------------------------------
 
+DWORD * GetNextTaskFromTask(DWORD *task)
+{
+	DWORD *ret_task=NULL;
+
+	if(!task || *task < 0x800000 || *task > 0x900000) return NULL;
+
+	_asm pushad
+	_asm mov edx, task
+	_asm mov ebx, [edx]
+	_asm mov edx, [ebx+8]
+	_asm mov ecx, task
+	_asm call edx
+	_asm mov ret_task, eax
+	_asm popad
+
+	return ret_task;
+}
+
+//-----------------------------------------------------------
+
+int GetTaskTypeFromTask(DWORD *task)
+{
+	int i = 0;
+
+	if(!task || *task < 0x800000 || *task > 0x900000) return 0;
+
+	_asm pushad
+	_asm mov edx, task
+	_asm mov ebx, [edx]
+	_asm mov edx, [ebx+10h]
+	_asm mov ecx, task
+	_asm call edx
+	_asm mov i, eax
+	_asm popad
+
+	return i;
+}
+
+//-----------------------------------------------------------
+
+const char* GetTaskNameFromTask(DWORD *task)
+{
+	return "None";
+}
+
+//-----------------------------------------------------------
+
+int Game_PedStatPrim(int model_id)
+{
+	/*if(model_id >= 0 && model_id <= 30000) {
+		MODEL_INFO_TYPE *pModelInfo = GetModelInfo(model_id);
+		if(!pModelInfo || pModelInfo->vtable != 0x85BDC0) {
+			return FALSE;
+		}
+	}
+	int *pStat = (int *)((*GetModelInfo(model_id)) + 40);
+	return *pStat;*/
+	return 0;
+}
+
+//----------------------------------------------------
+
+
+
+
+
+// TODO: sub_100B4100
+// TODO: sub_100B4140
+// TODO: sub_100B4180
+
+
+
+
+
+
+//-----------------------------------------------------------
+
 BOOL __stdcall GameIsEntityOnScreen(DWORD * pdwEnt)
 {
 	BOOL bResult = FALSE;
@@ -1367,6 +1519,16 @@ BOOL __stdcall GameIsEntityOnScreen(DWORD * pdwEnt)
 
 	return bResult != FALSE;
 }
+
+//-----------------------------------------------------------
+
+
+
+
+
+
+
+
 
 //-----------------------------------------------------------
 
@@ -1451,6 +1613,10 @@ DWORD __stdcall CRC32FromUpcaseString(char *szString)
 }
 
 
+DWORD *__stdcall GetModelRwObject(int iModelID)
+{
+	return GetModelInfo(iModelID)->pdwRenderWare;
+}
 
 
 
@@ -1461,6 +1627,22 @@ bool unnamed_100B4B50(VECTOR *vecPos)
 		vecPos->Y < 20000.0f && vecPos->Y > -20000.0f &&
 		vecPos->Z < 100000.0f && vecPos->Z > -10000.0f;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1503,6 +1685,17 @@ BOOL __stdcall IsATrainPart(ENTITY_TYPE *pEntity)
 	}
 	return FALSE;
 }
+
+//----------------------------------------------------
+
+
+
+
+
+
+
+
+
 
 //-----------------------------------------------------------
 
@@ -1609,6 +1802,16 @@ float GetNormalisation(VECTOR *vec)
 
 //----------------------------------------------------
 
+
+
+
+
+
+
+
+
+//----------------------------------------------------
+
 float DegToRad(float fDegrees)
 {
 	if (fDegrees > 360.0f || fDegrees < 0.0f) return 0.0f;
@@ -1629,6 +1832,18 @@ float InvDegToRad(float fDegrees)
 	} else {
 		return (float)(((fDegrees * PI) / 180.0f) * -1.0f);
 	}
+}
+
+//----------------------------------------------------
+
+float InvSqrt(float x)
+{
+	float xhalf = 0.5f * x;
+	int i = *(int*)&x;
+	i = 0x5f3759d5 - (i >> 1);
+	x = *(float*)&i;
+	x = x*(1.5f - xhalf*x*x);
+	return x;
 }
 
 //----------------------------------------------------
@@ -1821,6 +2036,53 @@ void CreateCameraRaster()
 
 //----------------------------------------------------
 
+DWORD GLOBAL_1026DFB8;
+DWORD GLOBAL_1026DFBC;
+
+void FUNC_100B5D20()
+{
+	DWORD dwCurDeviceCamera;
+
+	_asm pushad
+
+	CreateCameraRaster();
+
+	_asm mov eax, dwCameraScene
+	_asm mov eax, [eax]
+	_asm mov dwCurDeviceCamera, eax
+	_asm mov ds:[0xC9BCC0], eax
+
+	_asm mov ebx, dwCurDeviceCamera
+	_asm mov edx, [ebx+0x60]
+	_asm mov GLOBAL_1026DFB8, edx
+	_asm mov edx, [ebx+0x64]
+	_asm mov GLOBAL_1026DFBC, edx
+
+	_asm mov edx, CamFrameBuffer2
+	_asm mov [ebx+0x60], edx
+	_asm mov edx, CamZBuffer2
+	_asm mov [ebx+0x64], edx
+
+	_asm mov edx, 0x734650
+	_asm call edx
+
+	_asm mov edx, 0x53DF40
+	_asm call edx
+
+	_asm mov edx, 0x732F30
+	_asm call edx
+
+	_asm mov ebx, dwCurDeviceCamera
+	_asm mov edx, GLOBAL_1026DFB8
+	_asm mov [ebx+0x60], edx
+	_asm mov edx, GLOBAL_1026DFBC
+	_asm mov [ebx+0x64], edx
+
+	_asm popad
+}
+
+//----------------------------------------------------
+
 void ResetLocalPad(int unk1, int unk2)
 {
 	// CPad__GetPadAt(int index)
@@ -1911,7 +2173,7 @@ void RemoveColorEmbedsFromString(char *szString)
 	*szString = 0;
 }
 
-DWORD unnamed_100B6100(char *szString, int nMaxLen)
+DWORD FUNC_100B6100(char *szString, int nMaxLen)
 {
 	char tmp_buf[2049];
 	memset(tmp_buf, 0, sizeof(tmp_buf));
@@ -1963,5 +2225,11 @@ UINT GetVehicleSubtypeFromVehiclePtr(VEHICLE_TYPE *pVehicle)
 	return 0;
 }
 
+unsigned short __stdcall GetModelReferenceCount(int nModelIndex)
+{
+	// TODO: GetModelReferenceCount .text:100B4700
+
+	return 0;
+}
 
 

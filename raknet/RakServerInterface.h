@@ -247,6 +247,10 @@ public:
 	/// \return True on a successful packet send (this does not indicate the recipient performed the call), false on failure
 	virtual bool RPC( char* uniqueID, RakNet::BitStream *bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel, PlayerID playerId, bool broadcast, bool shiftTimestamp, NetworkID networkID, RakNet::BitStream *replyFromTarget )=0;
 
+	// SAMPSRV (adding this just as a tag for next RakNet upgrade)
+	virtual bool RPC( char* uniqueID, RakNet::BitStream *bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel, PlayerID playerId, bool broadcast, bool shiftTimestamp)=0;
+	// SAMPSRV end
+
 	/// Enables or disables frequency table tracking.  This is required to get a frequency table, which is used in GenerateCompressionLayer()
 	/// This value persists between connect calls and defaults to false (no frequency tracking)
 	/// \pre You can call this at any time - however you SHOULD only call it when disconnected.  Otherwise you will only trackpart of the values sent over the network.
@@ -373,7 +377,7 @@ public:
 
 	/// Bans an IP from connecting.  Banned IPs persist between connections.
 	/// param[in] IP Dotted IP address. Can use * as a wildcard, such as 128.0.0.* will banAll IP addresses starting with 128.0.0
-	virtual void AddToBanList( const char *IP )=0;
+	virtual void AddToBanList( const char *IP, RakNetTime milliseconds=0 )=0;
 
 	/// Allows a previously banned IP to connect. 
 	/// param[in] Dotted IP address. Can use * as a wildcard, such as 128.0.0.* will banAll IP addresses starting with 128.0.0

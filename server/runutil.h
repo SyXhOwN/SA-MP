@@ -1,1 +1,12 @@
 
+char Util_toupper(char c);
+
+void Util_strupr(char *string);
+int Util_wildcmp(char *wild, char *string);
+int Util_strnicmp(const char *s1, const char *s2, size_t n);
+char *Util_strrev(char *str);
+char * Util_itoa(int v, char *s, int r);
+char * Util_utoa(unsigned int v, char *s, int r);
+void Util_Base64Encode( char *cpInput, char *cpOutput );
+
+

@@ -1,39 +1,74 @@
 
 #include "../main.h"
+#include "game.h"
+#include "util.h"
+#include "keystuff.h"
+#include "aimstuff.h"
 
 extern int iGtaVersion;
+extern CNetGame* pNetGame;
+extern CGame* pGame;
+extern CChatWindow *pChatWindow;
 
 extern DWORD dwGraphicsLoop; // Used for the external dll game loop.
 
-#define NUDE void _declspec(naked) 
+int WINAPI exc_filter(unsigned int code, struct _EXCEPTION_POINTERS *ep, char *what);
 
+#define NUDE void _declspec(naked)
+
+//-----------------------------------------------------------
+// Globals which are used to avoid stack frame alteration
+// inside the following hook procedures.
+
+GTA_CONTROLSET *pGcsKeys;
+
+DWORD	dwFarClipHookAddr=0;
+DWORD	dwFarClipReturnAddr=0;
+
+// used generically
+PED_TYPE	*_pPlayer;
+
+BYTE	byteInternalPlayer=0;
+DWORD	dwCurPlayerActor=0;
+BYTE	byteCurPlayer=0;
+BYTE	byteSavedCameraMode;
+WORD	wSavedCameraMode2;
 BYTE	*pbyteCameraMode = (BYTE *)0xB6F1A8;
 BYTE	*pbyteCurrentPlayer = (BYTE *)0xB7CD74;
+WORD    *wCameraMode2 = (WORD*)0xB6F858;
+DWORD	*pdwVehicleEnginePed = (DWORD *)0xB6B990;
+
+float   fHealth;
 
 float fFarClip=1400.0f;
 
-DWORD unnamed_101516D4;
+//-----------------------------------------------------------
+// currently unknown where would it be placed
+DWORD GLOBAL_101516D4;
+WORD wLastRendObj;
+CPlayerPool *_pPlayerPool;
 
-WORD wLastRendObj=0;
+//-----------------------------------------------------------
+// x86 codes to perform our unconditional jmp for detour entries. 
 
-BYTE Unk1_JmpCode[] = {0xFF,25,0xD1,0xBE,53,0x00};
-BYTE TaskEnterVehicleDriver_HookJmpCode[] = {0xFF,0x25,0xBB,0x19,0x69,0x00,0x90};
-BYTE TaskExitVehicle_HookJmpCode[] = {0xFF,0x25,0xBA,0xB8,0x63,0x00,0x90};
-BYTE RadarTranslateColor_HookJmpCode[] = {0xFF,0x25,0x79,0x4A,0x58,0x00,0x90};
-BYTE CheatProcessHook_JmpCode[] = {0xFF,0x25,0xAA,0x85,0x43,0x00,0x90};
-BYTE Unk2_JmpCode[] = {0xFF,0x25,0x33,0x14,0x42,0x00};
-BYTE Unk3_JmpCode[] = {0xFF,0x25,0x61,0x36,0x53,0x00,0x90,0x90,0x90};
-BYTE CGameShutdown_HookJmpCode[] = {0xFF,0x25,0xF1,0xC8,0x53,0x00,0x90};
-BYTE PedDamage_HookJmpCode[] = {0xFF,0x25,0xBC,0x5A,0x4B,0x00};
-BYTE Unk4_JmpCode[] = {0xFF,0x25,0x74,0x22,0x50,0x00,0x90,0x90,0x90,0x90};
-BYTE Unk5_JmpCode[] = {0xFF,0x25,0x61,0x38,0x4C,0x00};
-BYTE GetText_HookJmpCode[] = {0xFF,0x25,0x43,0x00,0x6A,0x00,0x90,0x90,0x90};
-BYTE Unk6_JmpCode[] = {0xFF,0x25,0xD8,0xFF,0x5E,0x00,0x90};
-BYTE CProjectileInfo_Update_HookJmpCode[] = {0xFF,0x25,0x1B,0x8B,0x73,0x00};
-BYTE CWeapon__Satchel__Activate_HookJmpCode[] = {0xFF,0x25,0x5B,0x88,0x73,0x00};
-BYTE Unk7_JmpCode[] = {0xFF,0x25,0x36,0xA0,0x63,0x00,0x90};
-BYTE Unk8_JmpCode[] = {0xFF,0x25,0x77,0xAB,0x5E,0x00,0x90};
-BYTE Unk9_JmpCode[] = {0xFF,0x25,0x39,0x88,0x4C,0x00,0x90,0x90};
+BYTE GameProcess_HookJmpCode[] = {0xFF,0x25,0xD1,0xBE,0x53,0x00}; //53BED1
+BYTE TaskEnterVehicleDriver_HookJmpCode[] = {0xFF,0x25,0xBB,0x19,0x69,0x00,0x90};//0x6919BB
+BYTE TaskExitVehicle_HookJmpCode[] = {0xFF,0x25,0xBA,0xB8,0x63,0x00,0x90};//0x63B8BA
+BYTE RadarTranslateColor_HookJmpCode[] = {0xFF,0x25,0x79,0x4A,0x58,0x00,0x90}; // 584A79
+BYTE CheatProcessHook_JmpCode[] = {0xFF,0x25,0xAA,0x85,0x43,0x00,0x90}; // 4385AA
+BYTE AddVehicleHook_HookJmpCode[] = {0xFF,0x25,0x33,0x14,0x42,0x00}; // 421433
+BYTE SetFarClip_HookJmpCode[] = {0xFF,0x25,0x61,0x36,0x53,0x00,0x90,0x90,0x90}; // 533661
+BYTE CGameShutdown_HookJmpCode[] = {0xFF,0x25,0xF1,0xC8,0x53,0x00,0x90}; // 53C8F1
+BYTE PedDamage_HookJmpCode[] = {0xFF,0x25,0xBC,0x5A,0x4B,0x00}; // 4B5ABC
+BYTE VehicleAudio_HookJmpCode[] = {0xFF,0x25,0x74,0x22,0x50,0x00,0x90,0x90,0x90,0x90}; // 502274
+BYTE GenTaskAlloc_HookJmpCode[] = {0xFF,0x25,0x61,0x38,0x4C,0x00}; // 4C3861
+BYTE GetText_HookJmpCode[] = {0xFF,0x25,0x43,0x00,0x6A,0x00,0x90,0x90,0x90}; // 0x6A004325
+BYTE PedSay_HookJmpCode[] = {0xFF,0x25,0xD8,0xFF,0x5E,0x00,0x90}; //5EFFD8
+BYTE CProjectileInfo_Update_HookJmpCode[] = {0xFF,0x25,0x1B,0x8B,0x73,0x00}; //00738B1B
+BYTE CWeapon__Satchel__Activate_HookJmpCode[] = {0xFF,0x25,0x5B,0x88,0x73,0x00}; // 0073885B
+BYTE SetColor_HookJmpCode[] = {0xFF,0x25,0x36,0xA0,0x63,0x00,0x90};
+BYTE Rand_HookJmpCode[] = {0xFF,0x25,0x77,0xAB,0x5E,0x00,0x90}; // 5EAB77
+BYTE VehicleModel_SetEnvironmentMap_JmpCode[] = {0xFF,0x25,0x39,0x88,0x4C,0x00,0x90,0x90}; // 4C8839
 BYTE HOOK_7_JmpCode[] = {0xFF,0x25,0x34,0x39,0x4D,0x00,0x90,0x90,0x90,0x90};
 BYTE HOOK_8_JmpCode[] = {0xFF,0x25,0x09,0x46,0x4D,0x00,0x90};
 BYTE Unk10_JmpCode[] = {0xFF,0x25,0xE5,0x42,0x4D,0x00,0x90};
@@ -48,23 +83,23 @@ BYTE HOOK_60_JmpCode[] = {0xFF,0x25,0xDB,0x74,0x56,0x00};
 
 //-----------------------------------------------------------
 
-
 // TODO: HOOK_*() functions
 NUDE HOOK_1() {}
 NUDE HOOK_2() {}
 NUDE HOOK_3() {}
 NUDE HOOK_4() {}
 NUDE CPed_Render_Hook() {}
+
 NUDE HOOK_7() {}
 NUDE HOOK_8() {}
-NUDE CPlayerPed_ProcessControl_Hook() {}
 NUDE HOOK_10() {}
 NUDE TaskUseGun_Hook() {}
 NUDE HOOK_12() {}
+NUDE CPlayerPed_ProcessCollision_Hook() {}
 NUDE HOOK_14() {}
 NUDE HOOK_15() {}
 NUDE AllVehicles_ProcessControl_Hook() {}
-NUDE HOOK_17() {}
+NUDE VehicleHorn_Hook() {}
 NUDE ZoneOverlay_Hook() {}
 NUDE PlayerWalk_Hook() {}
 NUDE PickUpPickup_Hook() {}
@@ -115,7 +150,7 @@ NUDE HOOK_64() {}
 NUDE HOOK_65() {}
 NUDE HOOK_66() {}
 
-
+//-----------------------------------------------------------
 
 NUDE HOOK_6()
 {
@@ -125,81 +160,126 @@ NUDE HOOK_6()
 	_asm jmp edx
 }
 
-
 //-----------------------------------------------------------
 
-DWORD dwRandCaller;
-
-NUDE Rand_Hook()
+NUDE GameProcessHook()
 {
-	_asm mov eax, [esp+0]
-	_asm mov dwRandCaller, eax
-
-	/*
-	if(dwRandCaller > 0x73FB10 && dwRandCaller < 0x74132E) {
-		_asm mov eax, iSyncedRandomNumber
-		_asm ret
-	}*/
-
-	rand();
+	_asm add esp, 190h
 	_asm ret
 }
 
 //-----------------------------------------------------------
-// We use a special bit (32) on dwProcFlags (+28) to indicate
-// whether we should process gravity/collisions on this PlayerPed.
+// A hook function that switches keys for
+// CPlayerPed::ProcessControl(void)
 
-NUDE CPlayerPed_ProcessCollision_Hook()
+BYTE bytePatchPedRot[6] = { 0xD9,0x96,0x5C,0x05,0x00,0x00 };
+BYTE bytePatchPedRot2[6] = { 0xD9,0x96,0x5C,0x05,0x00,0x00 };
+BYTE bytePatchPedPos[5] = { 0xE8,0x17,0x88,0xFF,0xFF };
+
+void TryProcessPedControl()
 {
-	_asm test ecx, ecx
-	_asm jnz ptr_is_ok
+	__try
+	{
+		// call the internal CPlayerPed:ProcessControl
+		_asm mov ecx, dwCurPlayerActor
+		_asm mov edx, 0x60EA90
+		_asm call edx
+	}
+	__except(exc_filter(GetExceptionCode(), GetExceptionInformation(), "opcode"))
+	{
+		if(*pbyteCurrentPlayer != 0 && pNetGame) {
+			_pPlayerPool = pNetGame->GetPlayerPool();
+
+			// TODO: TryProcessPedControl()
+		}
+	}
+}
+
+void DisablePedRotationFromCamera()
+{
+	// Reapply the no ped rots from Cam patch
+	memset((PVOID)0x6884C4,0x90,6);
+
+	memset((PVOID)0x688200,0x90,6);
+}
+
+void EnablePedRotationFromCamera()
+{
+	// Apply the original code to set ped rot from Cam
+	memcpy((PVOID)0x6884C4,bytePatchPedRot,6);
+
+	memcpy((PVOID)0x688200,bytePatchPedRot2,6);
+}
+
+void DisablePedPositionUpdate()
+{
+	UnFuck(0x5E92F4,5);
+	memset((PVOID)0x5E92F4,0x90,5);
+}
+
+void EnablePedPositionUpdate()
+{
+	memcpy((PVOID)0x5E92F4,bytePatchPedPos,5);
+}
+
+NUDE CPlayerPed_ProcessControl_Hook()
+{
+	_asm mov dwCurPlayerActor, ecx // store the passed actor
+	_asm pushad
+
+	_pPlayer = (PED_TYPE *)dwCurPlayerActor;
+	byteInternalPlayer = *pbyteCurrentPlayer; // get the current internal player number
+	byteCurPlayer = FindPlayerNumFromPedPtr(dwCurPlayerActor); // get the ordinal of the passed actor
+
+	if( dwCurPlayerActor && 
+		(byteCurPlayer != 0) &&
+		(byteInternalPlayer == 0) ) // not local player and local player's keys set.
+	{
+		// key switching
+		GameStoreLocalPlayerKeys(); // remember local player's keys
+		GameSetRemotePlayerKeys(byteCurPlayer); // set remote player's keys
+
+		// save the internal cammode, apply the context.
+		byteSavedCameraMode = *pbyteCameraMode;
+		*pbyteCameraMode = GameGetPlayerCameraMode(byteCurPlayer);
+
+		// save the second internal cammode, apply the context
+		wSavedCameraMode2 = *wCameraMode2;
+		*wCameraMode2 = GameGetPlayerCameraMode(byteCurPlayer);
+		if(*wCameraMode2 == 4) *wCameraMode2 = 0;
+
+		// save the camera zoom factor, apply the context
+		GameStoreLocalPlayerCameraExtZoom();
+		GameSetRemotePlayerCameraExtZoom(byteCurPlayer);
+
+		// aim switching
+		GameStoreLocalPlayerAim();
+		GameSetRemotePlayerAim(byteCurPlayer);
+
+		GameStoreLocalPlayerWeaponSkills();
+		GameSetRemotePlayerWeaponSkills(byteCurPlayer);
+
+		*pbyteCurrentPlayer = byteCurPlayer; // Set the internal player to the passed actor
+
+		fHealth = _pPlayer->fHealth;
+
+		DisablePedPositionUpdate();
+		TryProcessPedControl();
+		EnablePedPositionUpdate();
+	}
+	else // it's the local player or keys have already been set.
+	{
+		// TODO: CPlayerPed_ProcessControl_Hook()
+	}
+
+	_asm popad
 	_asm ret
-ptr_is_ok:
-	_asm mov eax, [ecx+28]
-	_asm shr eax, 31
-	_asm cmp eax, 1
-	_asm jne do_process_cols
-	_asm ret // we set top bit so don't process this
-do_process_cols:
-    _asm mov edx, 0x54DFB0
-	_asm jmp edx
 }
 
-//-----------------------------------------------------------
-DWORD dwMat;
-DWORD dwMatEffects;
-DWORD dwDataParam;
 
-NUDE VehicleModel_SetEnvironmentMapHook()
-{
-	_asm mov eax, [esp+4]
-	_asm mov dwMat, eax
-	_asm mov eax, [esp+8]
-	_asm mov dwDataParam, eax
 
-	UnFuck(0x6D64F0,1);
-	*(PBYTE)0x6D64F0 = 0xC3;
 
-	/*
-	_asm push dwMat
-	_asm mov edx, 0x812140	// _RpMatFXMaterialGetEffects
-	_asm call edx
-	_asm pop edx
-	_asm mov dwMatEffects, eax*/
 
-	_asm push 0
-	_asm push dwMat
-	_asm mov edx, 0x811C80	// _RpMatFXMaterialSetEffects
-	_asm call edx
-	_asm pop edx
-	_asm pop edx
-
-	//pChatWindow->AddDebugMessage("SetEnvironmentMapCB(0x%X,0x%X,%d)",dwMat,dwDataParam,dwMatEffects);
-
-	_asm mov edx, 0x4C8848
-    _asm cmp [esp+8], 0FFFFh
-	_asm jmp edx
-}
 
 //-----------------------------------------------------------
 
@@ -306,11 +386,11 @@ void GameInstallHooks()
 	InstallMethodHook(0x872398,(DWORD)AllVehicles_ProcessControl_Hook); // train
 	InstallMethodHook(0x871C50,(DWORD)AllVehicles_ProcessControl_Hook);
 
-	InstallCallHook(0x501B1D,(DWORD)HOOK_17);
-	InstallCallHook(0x501B42,(DWORD)HOOK_17);
-	InstallCallHook(0x501FC2,(DWORD)HOOK_17);
-	InstallCallHook(0x502067,(DWORD)HOOK_17);
-	InstallCallHook(0x5021AE,(DWORD)HOOK_17);
+	InstallCallHook(0x501B1D,(DWORD)VehicleHorn_Hook);
+	InstallCallHook(0x501B42,(DWORD)VehicleHorn_Hook);
+	InstallCallHook(0x501FC2,(DWORD)VehicleHorn_Hook);
+	InstallCallHook(0x502067,(DWORD)VehicleHorn_Hook);
+	InstallCallHook(0x5021AE,(DWORD)VehicleHorn_Hook);
 
 	// Radar and map hooks for gang zones
 	InstallCallHook(0x5869BF,(DWORD)ZoneOverlay_Hook);
@@ -361,12 +441,12 @@ void GameInstallHooks()
 	if(iGtaVersion == GTASA_VERSION_USA10)
 	{
 		InstallHook(0x7FB020,(DWORD)HOOK_36,0x59C721,HOOK_36_JmpCode,sizeof(HOOK_36_JmpCode));
-		unnamed_101516D4 = 0x7FB026;
+		GLOBAL_101516D4 = 0x7FB026;
 	}
 	else
 	{
 		InstallHook(0x7FB060,(DWORD)HOOK_36,0x59C721,HOOK_36_JmpCode,sizeof(HOOK_36_JmpCode));
-		unnamed_101516D4 = 0x7FB066;
+		GLOBAL_101516D4 = 0x7FB066;
 	}
 
 	InstallCallHook(0x6D0E7E,(DWORD)HOOK_37);
@@ -431,14 +511,14 @@ void GameInstallHooks()
 
 //-----------------------------------------------------------
 
-void unnamed_100A6FF0()
+void FUNC_100A6FF0()
 {
 	InstallHook(0x4087EA,(DWORD)HOOK_61,0x4087D7,HOOK_61_JmpCode,sizeof(HOOK_61_JmpCode));
 }
 
 //-----------------------------------------------------------
 
-void unnamed_100A7010()
+void FUNC_100A7010()
 {
 	InstallCallHook(0x742495,(DWORD)HOOK_62);
 	InstallCallHook(0x7424EC,(DWORD)HOOK_62);
@@ -455,7 +535,7 @@ void unnamed_100A7010()
 
 //-----------------------------------------------------------
 
-void unnamed_100A71C0()
+void FUNC_100A71C0()
 {
 	InstallCallHook(0x6D7C90,(DWORD)HOOK_66,0xE9);
 }

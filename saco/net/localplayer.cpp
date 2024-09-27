@@ -1,7 +1,16 @@
 
 #include "../main.h"
+#include "../game/util.h"
 
 extern CGame		 *pGame;
+extern CNetGame		 *pNetGame;
+
+BOOL bFirstSpawn = TRUE;
+
+int iNetModeNormalOnfootSendRate	= NETMODE_NORMAL_ONFOOT_SENDRATE;
+int iNetModeNormalIncarSendRate		= NETMODE_NORMAL_INCAR_SENDRATE;
+int iNetModeFiringSendRate			= NETMODE_FIRING_SENDRATE;
+int iNetModeSendMultiplier			= NETMODE_SEND_MULTIPLIER;
 
 //----------------------------------------------------------
 
@@ -15,8 +24,8 @@ CLocalPlayer::CLocalPlayer()
 	field_2D6 = GetTickCount();
 	field_2F6 = 0;
 	m_pPlayerPed = pGame->FindPlayerPed();
-	field_F0 = 0;
-	field_F4 = 0;
+	m_bIsActive = FALSE;
+	m_bIsWasted = FALSE;
 	field_10D = 0;
 	field_30A = 0;
 	field_10F = GetTickCount();
@@ -26,26 +35,26 @@ CLocalPlayer::CLocalPlayer()
 	field_11B = field_10F;
 	m_bIsSpectating = FALSE;
 	field_30F = 0;
-	field_310 = -1;
+	m_SpectateID = 0xFFFFFFFF;
 	field_306 = 0;
 
 	ResetAllSyncAttributes();
 
-	int x=0;
+	DWORD x=0;
 	while(x!=13) {
 		field_18A[x] = 0;
 		field_197[x] = 0;
 		x++;
 	}
 
-	field_10C = -1;
+	m_byteTeam = NO_TEAM;
 }
 
 //----------------------------------------------------------
 
 void CLocalPlayer::ResetAllSyncAttributes()
 {
-	field_17D = 0;
+	m_bHasSpawnInfo = FALSE;
 	field_2FA = 0;
 	field_302 = 0;
 	field_2FE = 0;
@@ -83,4 +92,118 @@ void CLocalPlayer::Say(PCHAR szText)
 }
 
 //----------------------------------------------------------
+
+
+
+//----------------------------------------------------------
+
+BOOL CLocalPlayer::Spawn()
+{
+	if(!m_bHasSpawnInfo) return FALSE;
+
+	CCamera	*pGameCamera;
+	pGameCamera = pGame->GetCamera();
+	pGameCamera->Restore();
+	pGameCamera->SetBehindPlayer();
+	pGame->DisplayHud(TRUE);
+	m_pPlayerPed->TogglePlayerControllable(1);
+
+	if(!bFirstSpawn) {
+		m_pPlayerPed->SetInitialState();
+	} else {
+		bFirstSpawn = FALSE;
+	}
+
+	// TODO: CLocalPlayer::Spawn
+
+	return TRUE;
+}
+
+//----------------------------------------------------------
+
+
+
+//----------------------------------------------------
+
+void CLocalPlayer::SetPlayerColor(DWORD dwColor)
+{
+	SetRadarColor(pNetGame->GetPlayerPool()->GetLocalPlayerID(),dwColor);
+}
+
+//----------------------------------------------------
+
+DWORD CLocalPlayer::GetPlayerColorAsRGBA()
+{
+	return TranslateColorCodeToRGBA(pNetGame->GetPlayerPool()->GetLocalPlayerID());
+}
+
+//----------------------------------------------------
+
+DWORD CLocalPlayer::GetPlayerColorAsARGB()
+{
+	return (TranslateColorCodeToRGBA(pNetGame->GetPlayerPool()->GetLocalPlayerID()) >> 8) | 0xFF000000;
+}
+
+//----------------------------------------------------
+
+void CLocalPlayer::ProcessOnFootWorldBounds()
+{
+	if(pGame->GetActiveInterior() != 0) return; // can't enforce inside interior
+
+	if( m_pPlayerPed->EnforceWorldBoundries(
+		pNetGame->field_3D5->WorldBounds[0],
+		pNetGame->field_3D5->WorldBounds[1],
+		pNetGame->field_3D5->WorldBounds[2],
+		pNetGame->field_3D5->WorldBounds[3]) )
+	{
+		m_pPlayerPed->SetArmedWeapon(0);
+		pGame->DisplayGameText("Stay within the ~r~world boundries",1000,5);
+	}
+}
+
+//----------------------------------------------------
+
+void CLocalPlayer::ProcessInCarWorldBounds()
+{
+	CVehiclePool *pVehiclePool = pNetGame->GetVehiclePool();
+	VEHICLEID VehicleID = (VEHICLEID)pVehiclePool->FindIDFromGtaPtr(m_pPlayerPed->GetGtaVehicle());
+	CVehicle *pGameVehicle;
+
+	if(pGame->GetActiveInterior() != 0) return; // can't enforce inside interior
+
+	if(VehicleID != INVALID_VEHICLE_ID) {
+		pGameVehicle = pVehiclePool->GetAt(VehicleID);
+		if(!pGameVehicle) return;
+
+		if( pGameVehicle->EnforceWorldBoundries(
+			pNetGame->field_3D5->WorldBounds[0],
+			pNetGame->field_3D5->WorldBounds[1],
+			pNetGame->field_3D5->WorldBounds[2],
+			pNetGame->field_3D5->WorldBounds[3]) )
+		{
+			pGame->DisplayGameText("Stay within the ~r~world boundries",1000,5);
+		}
+	}
+}
+
+//-----------------------------------------------------
+
+
+
+
+
+
+
+
+//-----------------------------------------------------------
+
+void CLocalPlayer::ToggleSpectating(BOOL bToggle)
+{
+	// TODO: CLocalPlayer::ToggleSpectating
+
+	m_bIsSpectating = bToggle;
+	m_SpectateID = 0xFFFFFFFF;
+}
+
+//-----------------------------------------------------------
 

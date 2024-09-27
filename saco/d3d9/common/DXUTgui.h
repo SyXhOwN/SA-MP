@@ -327,6 +327,7 @@ public:
     bool        MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
     
     int AddFont( LPCTSTR strFaceName, LONG height, LONG weight );
+	int SetFont(UINT iFont, LPCTSTR strFaceName, LONG height, LONG weight);
     int AddTexture( LPCTSTR strFilename );
 
     DXUTFontNode*     GetFontNode( int iIndex )     { return m_FontCache.GetAt( iIndex ); };
@@ -765,11 +766,12 @@ protected:
     bool m_bPressed;
     RECT m_rcButton;
 
-    bool field_76;
-    D3DXCOLOR field_77;
+	bool field_76;
+	D3DXCOLOR field_77;
 
 public:
-    void SetColor(D3DXCOLOR c) { field_76 = true; field_77 = c; };
+	void SetColor(D3DXCOLOR c) { field_76 = true; field_77 = c; };
+	D3DXCOLOR* GetColor() { return &field_77; };
 
 };
 
@@ -1009,6 +1011,8 @@ public:
     virtual void RenderCandidateReadingWindow( IDirect3DDevice9* pd3dDevice, float fElapsedTime, bool bReading );
     virtual void RenderComposition( IDirect3DDevice9* pd3dDevice, float fElapsedTime );
     virtual void RenderIndicator( IDirect3DDevice9* pd3dDevice, float fElapsedTime );
+
+	static bool FUNC_100863E0();
 
 protected:
     static WORD GetLanguage() { return LOWORD( s_hklCurrent ); }

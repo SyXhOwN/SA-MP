@@ -2,7 +2,7 @@
 #include "game.h"
 
 //-----------------------------------------------------------
-
+// MATCH
 void CAudio::FUNC_100A21D0()
 {
 	if(field_0 && field_0 == 1)
@@ -16,7 +16,7 @@ void CAudio::FUNC_100A21D0()
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 int CAudio::GetRadioStation() 
 {
 	int iRadioStation = 0;
@@ -32,7 +32,7 @@ int CAudio::GetRadioStation()
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 void CAudio::StartRadio(int iStation)
 {
 	_asm push 0
@@ -43,7 +43,7 @@ void CAudio::StartRadio(int iStation)
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 void CAudio::StopRadio()
 {
 	_asm push 0
@@ -54,14 +54,14 @@ void CAudio::StopRadio()
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 float CAudio::GetRadioVolume()
 {
     return *(float*)0xB5FCC8;
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 void CAudio::StopOutdoorAmbienceTrack()
 {
 	_asm mov ecx, 0x8AC15C
@@ -70,7 +70,7 @@ void CAudio::StopOutdoorAmbienceTrack()
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 void CAudio::SetOutdoorAmbienceTrack(int iTrack)
 {
     _asm push iTrack
@@ -80,7 +80,7 @@ void CAudio::SetOutdoorAmbienceTrack(int iTrack)
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 void CAudio::PlaySound(int iSound, float fX, float fY, float fZ) 
 {
 	if(iSound == 0)
@@ -114,7 +114,7 @@ void CAudio::PlaySound(int iSound, float fX, float fY, float fZ)
 }
 
 //-----------------------------------------------------------
-
+// MATCH
 bool CAudio::IsOutdoorAmbienceTrackDisabled()
 {
 	return field_4;

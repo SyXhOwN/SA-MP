@@ -2,6 +2,8 @@
 #ifndef SAMPSRV_PLAYERPOOL_H
 #define SAMPSRV_PLAYERPOOL_H
 
+#define INVALID_PLAYER_ID 0xFFFF
+
 class CPlayerPool // size: WL 199024
 {
 private:
@@ -34,6 +36,8 @@ public:
 	CPlayerPool();
 	~CPlayerPool();
 
+	BOOL Process(float fElapsedTime);
+	BOOL New(PLAYERID playerId, PCHAR szPlayerName, PCHAR szClientID, PCHAR szVersion, BOOL bIsNPC);
 	BOOL Delete(PLAYERID playerId, BYTE byteReason);
 
 	// Retrieve a player
@@ -56,6 +60,16 @@ public:
 	PCHAR GetPlayerClientID(PLAYERID playerId) {
 		if(playerId >= MAX_PLAYERS) { return NULL; }
 		return m_szPlayerClientID[playerId];
+	};
+
+	void SetPlayerMoney(PLAYERID playerId, int iMoney) {
+		if(playerId >= MAX_PLAYERS) return;
+		m_iPlayerMoney[playerId] = iMoney;
+	};
+
+	void SetPlayerDrunkLevel(PLAYERID playerId, int iLevel) {
+		if(playerId >= MAX_PLAYERS) return;
+		m_iPlayerDrunkLevel[playerId] = iLevel;
 	};
 
 	void ResetPlayerScoresAndMoney() {
